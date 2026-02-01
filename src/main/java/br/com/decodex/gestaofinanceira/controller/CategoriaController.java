@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.decodex.gestaofinanceira.model.Categoria;
 import br.com.decodex.gestaofinanceira.service.CategoriaService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/categorias")
@@ -37,12 +38,12 @@ public class CategoriaController {
 	}	
 	
 	@PostMapping("/save")
-    public ResponseEntity<Categoria> create(@RequestBody Categoria categoria) {
+    public ResponseEntity<Categoria> create(@Valid @RequestBody Categoria categoria) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoriaService.create(categoria));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Categoria> update(@PathVariable Long id, @RequestBody Categoria categoria) {
+    public ResponseEntity<Categoria> update(@PathVariable Long id,@Valid @RequestBody Categoria categoria) {
         return ResponseEntity.ok(categoriaService.update(id, categoria));
     }
 

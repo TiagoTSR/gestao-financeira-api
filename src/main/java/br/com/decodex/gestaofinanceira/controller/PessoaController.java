@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.decodex.gestaofinanceira.model.Pessoa;
 import br.com.decodex.gestaofinanceira.service.PessoaService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/pessoas")
@@ -37,7 +38,7 @@ public class PessoaController {
 	}
 	
 	@PostMapping("/save")
-    public ResponseEntity<Pessoa> create(@RequestBody Pessoa pessoa) {
+    public ResponseEntity<Pessoa> create(@Valid @RequestBody Pessoa pessoa) {
         Pessoa created = pessoaService.create(pessoa);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -45,7 +46,7 @@ public class PessoaController {
     @PutMapping("/update/{id}")
     public ResponseEntity<Pessoa> update(
             @PathVariable Long id,
-            @RequestBody Pessoa pessoa) {
+            @Valid @RequestBody Pessoa pessoa) {
 
         pessoa.setId(id);
         return ResponseEntity.ok(pessoaService.update(pessoa));
