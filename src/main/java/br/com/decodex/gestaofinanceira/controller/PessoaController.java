@@ -1,7 +1,8 @@
 package br.com.decodex.gestaofinanceira.controller;
 
-import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.decodex.gestaofinanceira.model.Pessoa;
+import br.com.decodex.gestaofinanceira.repository.PessoaRepository;
+import br.com.decodex.gestaofinanceira.repository.filter.PessoaFilter;
+import br.com.decodex.gestaofinanceira.repository.specification.PessoaSpecification;
 import br.com.decodex.gestaofinanceira.service.PessoaService;
 import jakarta.validation.Valid;
 
@@ -23,13 +27,28 @@ public class PessoaController {
 	
 	private final PessoaService pessoaService;
 	
+	@Autowired
+	private PessoaRepository pessoaRepository;
+	
 	public PessoaController(PessoaService pessoaService) {
 		this.pessoaService = pessoaService;
 	}
 	
-	@GetMapping("/findAll")
-	public ResponseEntity<List<Pessoa>> findAll(){
-		return ResponseEntity.ok(pessoaService.findAll());
+	@GetMapping("/listAll")
+	public ResponseEntity<Page<Pessoa>> findAll(
+	        PessoaFilter pessoaFilter,
+	        Pageable pageable) {
+
+	    Page<Pessoa> page = pessoaRepository.findAll(
+	            PessoaSpecification.filtrar(pessoaFilter),
+	            pageable
+	    );
+
+	    if (page.isEmpty()) {
+	        return ResponseEntity.noContent().build();
+	    }
+
+	    return ResponseEntity.ok(page);
 	}
 	
 	@GetMapping("/findById/{id}")
