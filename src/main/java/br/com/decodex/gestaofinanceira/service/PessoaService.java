@@ -38,6 +38,12 @@ public class PessoaService {
 
 	@Transactional
 	public Pessoa create(Pessoa pessoa) {
+		
+		pessoa.setId(null);
+        
+        if (pessoa.getAtivo() == null) {
+            pessoa.setAtivo(true);
+        }
 
 	    return pessoaRepository.save(pessoa);
 	}

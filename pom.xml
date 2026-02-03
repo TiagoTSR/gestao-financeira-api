@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>br.com.decodex</groupId>
 	<artifactId>gestao-financeira-api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.3.0</version>
 	<name>gestao-financeira-api</name>
 	<description>API para gestão de pessoas, receitas e despesas</description>
 	<url/>
