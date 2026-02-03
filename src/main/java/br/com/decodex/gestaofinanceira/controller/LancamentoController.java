@@ -1,7 +1,8 @@
 package br.com.decodex.gestaofinanceira.controller;
 
-import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.decodex.gestaofinanceira.model.Lancamento;
+import br.com.decodex.gestaofinanceira.repository.LancamentoRepository;
+import br.com.decodex.gestaofinanceira.repository.filter.LancamentoFilter;
+import br.com.decodex.gestaofinanceira.repository.specification.LancamentoSpecification;
 import br.com.decodex.gestaofinanceira.service.LancamentoService;
 import jakarta.validation.Valid;
 
@@ -24,13 +28,28 @@ public class LancamentoController {
 	
 	private final LancamentoService lancamentoService;
 	
+	@Autowired
+	private LancamentoRepository lancamentoRepository;
+	
 	public LancamentoController(LancamentoService lancamentoService) {
 		this.lancamentoService = lancamentoService;
 	}
 	
-	@GetMapping("/findAll")
-	public ResponseEntity<List<Lancamento>> findAll(){
-		return ResponseEntity.ok(lancamentoService.findAll());
+	@GetMapping("/listAll")
+	public ResponseEntity<Page<Lancamento>> findAll(
+	        LancamentoFilter lancamentoFilter,
+	        Pageable pageable) {
+
+	    Page<Lancamento> page = lancamentoRepository.findAll(
+	            LancamentoSpecification.filtrar(lancamentoFilter),
+	            pageable
+	    );
+
+	    if (page.isEmpty()) {
+	        return ResponseEntity.noContent().build();
+	    }
+
+	    return ResponseEntity.ok(page);
 	}
 	
 	@GetMapping("/findById/{id}")
