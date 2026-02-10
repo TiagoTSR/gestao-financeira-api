@@ -1,5 +1,7 @@
 package br.com.decodex.gestaofinanceira.controller;
 
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -15,9 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.decodex.gestaofinanceira.dto.PessoaRequestDTO;
 import br.com.decodex.gestaofinanceira.dto.PessoaResponseDTO;
-import br.com.decodex.gestaofinanceira.model.Pessoa;
 import br.com.decodex.gestaofinanceira.repository.filter.PessoaFilter;
 import br.com.decodex.gestaofinanceira.service.PessoaService;
+import br.com.decodex.gestaofinanceira.service.QueryParamValidator;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -31,22 +34,20 @@ public class PessoaController {
 	}
 	
 	@GetMapping("/listAll")
-	public ResponseEntity<Page<PessoaResponseDTO>> findAll(
-	        PessoaFilter pessoaFilter,
-	        Pageable pageable) {
+    public ResponseEntity<Page<PessoaResponseDTO>> findAll(
+            PessoaFilter pessoaFilter,
+            Pageable pageable,
+            HttpServletRequest request) {
 
-	    Page<PessoaResponseDTO> page = pessoaService.findAll(pessoaFilter, pageable);
+    	QueryParamValidator.validate(request, Set.of("nome", "cidade", "ativo"));
 
-	    if (page.isEmpty()) {
-	        return ResponseEntity.noContent().build();
-	    }
-
-	    return ResponseEntity.ok(page);
-	}
+        Page<PessoaResponseDTO> page = pessoaService.findAll(pessoaFilter, pageable);
+        return ResponseEntity.ok(page);
+    }
 	
 	@GetMapping("/findById/{id}")
-	public ResponseEntity<Pessoa> findById(@PathVariable Long id){
-		return ResponseEntity.ok(pessoaService.findById(id));
+	public ResponseEntity<PessoaResponseDTO> findById(@PathVariable Long id){
+		return ResponseEntity.ok(pessoaService.findByIdDTO(id));
 	}
 	
 	@PostMapping("/save")

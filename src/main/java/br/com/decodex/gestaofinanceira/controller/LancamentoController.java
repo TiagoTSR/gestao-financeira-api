@@ -1,5 +1,7 @@
 package br.com.decodex.gestaofinanceira.controller;
 
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,8 @@ import br.com.decodex.gestaofinanceira.dto.LancamentoRequestDTO;
 import br.com.decodex.gestaofinanceira.dto.LancamentoResponseDTO;
 import br.com.decodex.gestaofinanceira.repository.filter.LancamentoFilter;
 import br.com.decodex.gestaofinanceira.service.LancamentoService;
+import br.com.decodex.gestaofinanceira.service.QueryParamValidator;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -32,15 +36,12 @@ public class LancamentoController {
 	@GetMapping("/listAll")
     public ResponseEntity<Page<LancamentoResponseDTO>> findAll(
             LancamentoFilter lancamentoFilter,
-            Pageable pageable
-    ) {
+            Pageable pageable,
+            HttpServletRequest request) {
+
+    	 QueryParamValidator.validate(request,Set.of("descricao", "dataVencimentoDe", "dataVencimentoAte"));
 
         Page<LancamentoResponseDTO> page = lancamentoService.findAll(lancamentoFilter, pageable);
-
-        if (page.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
         return ResponseEntity.ok(page);
     }
 	
