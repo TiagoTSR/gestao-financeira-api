@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.decodex.gestaofinanceira.model.Categoria;
+import br.com.decodex.gestaofinanceira.dto.CategoriaRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.CategoriaResponseDTO;
 import br.com.decodex.gestaofinanceira.service.CategoriaService;
 import jakarta.validation.Valid;
 
@@ -27,24 +28,25 @@ public class CategoriaController {
 		this.categoriaService = categoriaService;
 	}
 	
-	@GetMapping("/findAll")
-	public ResponseEntity<List<Categoria>> finAll(){
+	@GetMapping("/listAll")
+	public ResponseEntity<List<CategoriaResponseDTO>> findAll(){
 		return ResponseEntity.ok(categoriaService.findAll());
 	}
 	
 	@GetMapping("/findById/{id}")
-	public ResponseEntity<Categoria> findById(@PathVariable Long id){
-		return ResponseEntity.ok(categoriaService.findById(id));
+	public ResponseEntity<CategoriaResponseDTO> findById(@PathVariable Long id){
+		return ResponseEntity.ok(categoriaService.findByIdDTO(id));
 	}	
 	
 	@PostMapping("/save")
-    public ResponseEntity<Categoria> create(@Valid @RequestBody Categoria categoria) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(categoriaService.create(categoria));
+    public ResponseEntity<CategoriaResponseDTO> create(@Valid @RequestBody CategoriaRequestDTO dto) {
+		CategoriaResponseDTO created = categoriaService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Categoria> update(@PathVariable Long id,@Valid @RequestBody Categoria categoria) {
-        return ResponseEntity.ok(categoriaService.update(id, categoria));
+    public ResponseEntity<CategoriaResponseDTO> update(@PathVariable Long id,@Valid @RequestBody CategoriaRequestDTO dto) {
+        return ResponseEntity.ok(categoriaService.update(id, dto));
     }
 
     @DeleteMapping("/delete/{id}")

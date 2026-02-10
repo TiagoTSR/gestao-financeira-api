@@ -5,7 +5,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.decodex.gestaofinanceira.dto.CategoriaRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.CategoriaResponseDTO;
 import br.com.decodex.gestaofinanceira.exceptions.ResourceNotFoundException;
+import br.com.decodex.gestaofinanceira.mapper.CategoriaMapper;
 import br.com.decodex.gestaofinanceira.model.Categoria;
 import br.com.decodex.gestaofinanceira.repository.CategoriaRepository;
 
@@ -13,14 +16,19 @@ import br.com.decodex.gestaofinanceira.repository.CategoriaRepository;
 public class CategoriaService {
 	
     private final CategoriaRepository categoriaRepository;
+    private final CategoriaMapper mapper;
 
-    public CategoriaService(CategoriaRepository categoriaRepository){
+    public CategoriaService(CategoriaRepository categoriaRepository,CategoriaMapper mapper){
         this.categoriaRepository = categoriaRepository;
+        this.mapper = mapper;
     }
 
     @Transactional(readOnly = true)
-    public List<Categoria> findAll() {
-        return categoriaRepository.findAll();
+    public List<CategoriaResponseDTO> findAll() {
+    	return categoriaRepository.findAll()
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -28,22 +36,27 @@ public class CategoriaService {
         return categoriaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada: " + id));
     }
-
-    public Categoria create(Categoria categoria) {
-        categoria.setId(null); 
-        return categoriaRepository.save(categoria);
+    
+    @Transactional(readOnly = true)
+    public CategoriaResponseDTO findByIdDTO(Long id) {
+        return mapper.toDTO(findById(id));
     }
 
-    public Categoria update(Long id, Categoria categoriaRequest) {
+    public CategoriaResponseDTO create(CategoriaRequestDTO dto) {
+    	Categoria categoria = mapper.toEntity(dto);
+        Categoria salva = categoriaRepository.save(categoria);
+        return mapper.toDTO(salva);
+    }
+
+    public CategoriaResponseDTO update(Long id, CategoriaRequestDTO dto) {
         Categoria existente = findById(id);
-        existente.setNome(categoriaRequest.getNome());
-        return categoriaRepository.save(existente);
+        mapper.updateEntity(existente, dto);
+        Categoria salva = categoriaRepository.save(existente);
+        return mapper.toDTO(salva);
     }
 
     public void delete(Long id) {
-        if (!categoriaRepository.existsById(id)) {
-            throw new ResourceNotFoundException("ID inexistente");
-        }
-        categoriaRepository.deleteById(id);
+    	Categoria existente = findById(id);
+        categoriaRepository.delete(existente);
     }
 }
