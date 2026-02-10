@@ -5,7 +5,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.decodex.gestaofinanceira.dto.PessoaRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.PessoaResponseDTO;
 import br.com.decodex.gestaofinanceira.exceptions.ResourceNotFoundException;
+import br.com.decodex.gestaofinanceira.mapper.PessoaMapper;
 import br.com.decodex.gestaofinanceira.model.Endereco;
 import br.com.decodex.gestaofinanceira.model.Pessoa;
 import br.com.decodex.gestaofinanceira.repository.PessoaRepository;
@@ -16,17 +19,18 @@ import br.com.decodex.gestaofinanceira.repository.specification.PessoaSpecificat
 public class PessoaService {
 	
 	private final PessoaRepository pessoaRepository;
+	private final PessoaMapper mapper;
 	
-	public PessoaService(PessoaRepository pessoaRepository) {
+	public PessoaService(PessoaRepository pessoaRepository,PessoaMapper mapper) {
 		this.pessoaRepository = pessoaRepository;
+		this.mapper = mapper;
 	}
 	
 	@Transactional(readOnly = true)
-	public Page<Pessoa> findAll(PessoaFilter filter, Pageable pageable) {
+	public Page<PessoaResponseDTO> findAll(PessoaFilter filter, Pageable pageable) {
 	    return pessoaRepository.findAll(
 	            PessoaSpecification.filtrar(filter),
-	            pageable
-	    );
+	            pageable).map(mapper::toDTO);
 	}
 
 	@Transactional(readOnly = true)
@@ -35,32 +39,38 @@ public class PessoaService {
 	    return pessoaRepository.findById(id)
 	            .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada"));
 	}
+	
+	@Transactional(readOnly = true)
+    public PessoaResponseDTO findByIdDTO(Long id) {
+        return mapper.toDTO(findById(id));
+    }
 
 	@Transactional
-	public Pessoa create(Pessoa pessoa) {
+	public PessoaResponseDTO create(PessoaRequestDTO dto) {
 		
-		pessoa.setId(null);
+		Pessoa pessoa = mapper.toEntity(dto);
         
         if (pessoa.getAtivo() == null) {
             pessoa.setAtivo(true);
         }
-
-	    return pessoaRepository.save(pessoa);
+        
+        Pessoa salva = pessoaRepository.save(pessoa);
+	    return mapper.toDTO(salva);
+ 
 	}
 
 	@Transactional
-	public Pessoa update(Pessoa pessoa) {
-	    Pessoa entity = pessoaRepository.findById(pessoa.getId())
-	     .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada"));
+	public PessoaResponseDTO update(Long id, PessoaRequestDTO dto) {
+		Pessoa existente = findById(id);
 
-	    entity.setNome(pessoa.getNome());
+        mapper.updateEntity(existente, dto);
 
-	    Endereco endereco = pessoa.getEndereco();
+	    Endereco endereco = existente.getEndereco();
 	    if (endereco != null) {
-	        entity.setEndereco(endereco);
+	    	existente.setEndereco(endereco);
 	 }
-
-	    return pessoaRepository.save(entity);
+	    Pessoa salva = pessoaRepository.save(existente);
+	    return mapper.toDTO(salva);
 	 }
 
 	 @Transactional

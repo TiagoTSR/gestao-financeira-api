@@ -1,6 +1,5 @@
 package br.com.decodex.gestaofinanceira.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -12,12 +11,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.decodex.gestaofinanceira.dto.PessoaRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.PessoaResponseDTO;
 import br.com.decodex.gestaofinanceira.model.Pessoa;
-import br.com.decodex.gestaofinanceira.repository.PessoaRepository;
 import br.com.decodex.gestaofinanceira.repository.filter.PessoaFilter;
-import br.com.decodex.gestaofinanceira.repository.specification.PessoaSpecification;
 import br.com.decodex.gestaofinanceira.service.PessoaService;
 import jakarta.validation.Valid;
 
@@ -27,22 +27,16 @@ public class PessoaController {
 	
 	private final PessoaService pessoaService;
 	
-	@Autowired
-	private PessoaRepository pessoaRepository;
-	
 	public PessoaController(PessoaService pessoaService) {
 		this.pessoaService = pessoaService;
 	}
 	
 	@GetMapping("/listAll")
-	public ResponseEntity<Page<Pessoa>> findAll(
+	public ResponseEntity<Page<PessoaResponseDTO>> findAll(
 	        PessoaFilter pessoaFilter,
 	        Pageable pageable) {
 
-	    Page<Pessoa> page = pessoaRepository.findAll(
-	            PessoaSpecification.filtrar(pessoaFilter),
-	            pageable
-	    );
+	    Page<PessoaResponseDTO> page = pessoaService.findAll(pessoaFilter, pageable);
 
 	    if (page.isEmpty()) {
 	        return ResponseEntity.noContent().build();
@@ -57,18 +51,18 @@ public class PessoaController {
 	}
 	
 	@PostMapping("/save")
-    public ResponseEntity<Pessoa> create(@Valid @RequestBody Pessoa pessoa) {
-        Pessoa created = pessoaService.create(pessoa);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+	@ResponseStatus(HttpStatus.CREATED)
+    public PessoaResponseDTO create(@Valid @RequestBody PessoaRequestDTO dto) {
+		return pessoaService.create(dto);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Pessoa> update(
+    @ResponseStatus(HttpStatus.OK)
+    public PessoaResponseDTO update(
             @PathVariable Long id,
-            @Valid @RequestBody Pessoa pessoa) {
+            @Valid @RequestBody PessoaRequestDTO dto) {
 
-        pessoa.setId(id);
-        return ResponseEntity.ok(pessoaService.update(pessoa));
+    	 return pessoaService.update(id, dto);
     }
 
     @DeleteMapping("/delete/{id}")

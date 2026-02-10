@@ -57,6 +57,7 @@ public class LancamentoController {
     }
 
     @PutMapping("/update/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public LancamentoResponseDTO update(
             @PathVariable Long id,
             @Valid @RequestBody LancamentoRequestDTO dto) {
