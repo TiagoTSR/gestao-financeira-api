@@ -1,9 +1,10 @@
 package br.com.decodex.gestaofinanceira.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import br.com.decodex.gestaofinanceira.model.Categoria;
 
-public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
+public interface CategoriaRepository extends JpaRepository<Categoria, Long>,JpaSpecificationExecutor<Categoria> {
 
 }
