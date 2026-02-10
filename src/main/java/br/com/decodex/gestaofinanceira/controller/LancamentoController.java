@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.decodex.gestaofinanceira.dto.LancamentoRequestDTO;
@@ -51,23 +50,20 @@ public class LancamentoController {
 	}
 	
 	@PostMapping("/save")
-    @ResponseStatus(HttpStatus.CREATED)
-    public LancamentoResponseDTO create(@Valid @RequestBody LancamentoRequestDTO dto) {
-        return lancamentoService.create(dto);
+	public ResponseEntity<LancamentoResponseDTO> create(@Valid @RequestBody LancamentoRequestDTO dto) {
+		LancamentoResponseDTO created = lancamentoService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/update/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public LancamentoResponseDTO update(
-            @PathVariable Long id,
-            @Valid @RequestBody LancamentoRequestDTO dto) {
-        return lancamentoService.update(id, dto);
+    public ResponseEntity<LancamentoResponseDTO> update(@PathVariable Long id,@Valid @RequestBody LancamentoRequestDTO dto) {
+        return ResponseEntity.ok(lancamentoService.update(id, dto));
     }
 
     @DeleteMapping("/delete/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         lancamentoService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

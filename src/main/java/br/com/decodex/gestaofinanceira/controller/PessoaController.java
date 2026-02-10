@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.decodex.gestaofinanceira.dto.PessoaRequestDTO;
@@ -51,18 +50,14 @@ public class PessoaController {
 	}
 	
 	@PostMapping("/save")
-	@ResponseStatus(HttpStatus.CREATED)
-    public PessoaResponseDTO create(@Valid @RequestBody PessoaRequestDTO dto) {
-		return pessoaService.create(dto);
+	public ResponseEntity<PessoaResponseDTO> create(@Valid @RequestBody PessoaRequestDTO dto) {
+		PessoaResponseDTO created = pessoaService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/update/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public PessoaResponseDTO update(
-            @PathVariable Long id,
-            @Valid @RequestBody PessoaRequestDTO dto) {
-
-    	 return pessoaService.update(id, dto);
+    public ResponseEntity<PessoaResponseDTO> update(@PathVariable Long id,@Valid @RequestBody PessoaRequestDTO dto) {
+        return ResponseEntity.ok(pessoaService.update(id, dto));
     }
 
     @DeleteMapping("/delete/{id}")
