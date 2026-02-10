@@ -1,7 +1,8 @@
 package br.com.decodex.gestaofinanceira.service;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +12,8 @@ import br.com.decodex.gestaofinanceira.exceptions.ResourceNotFoundException;
 import br.com.decodex.gestaofinanceira.mapper.CategoriaMapper;
 import br.com.decodex.gestaofinanceira.model.Categoria;
 import br.com.decodex.gestaofinanceira.repository.CategoriaRepository;
+import br.com.decodex.gestaofinanceira.repository.filter.CategoriaFilter;
+import br.com.decodex.gestaofinanceira.repository.specification.CategoriaSpecification;
 
 @Service
 public class CategoriaService {
@@ -22,14 +25,13 @@ public class CategoriaService {
         this.categoriaRepository = categoriaRepository;
         this.mapper = mapper;
     }
-
+    
     @Transactional(readOnly = true)
-    public List<CategoriaResponseDTO> findAll() {
-    	return categoriaRepository.findAll()
-                .stream()
-                .map(mapper::toDTO)
-                .toList();
-    }
+    public Page<CategoriaResponseDTO> findAll(CategoriaFilter filter, Pageable pageable) {
+	    Specification<Categoria> spec = CategoriaSpecification.filtrar(filter);
+	    
+	    return categoriaRepository.findAll(spec, pageable).map(mapper::toDTO);
+	}
 
     @Transactional(readOnly = true)
     public Categoria findById(Long id) {

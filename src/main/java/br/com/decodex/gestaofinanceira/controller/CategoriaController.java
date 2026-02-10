@@ -1,7 +1,9 @@
 package br.com.decodex.gestaofinanceira.controller;
 
-import java.util.List;
+import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,7 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.decodex.gestaofinanceira.dto.CategoriaRequestDTO;
 import br.com.decodex.gestaofinanceira.dto.CategoriaResponseDTO;
+import br.com.decodex.gestaofinanceira.repository.filter.CategoriaFilter;
 import br.com.decodex.gestaofinanceira.service.CategoriaService;
+import br.com.decodex.gestaofinanceira.service.QueryParamValidator;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -29,9 +34,16 @@ public class CategoriaController {
 	}
 	
 	@GetMapping("/listAll")
-	public ResponseEntity<List<CategoriaResponseDTO>> findAll(){
-		return ResponseEntity.ok(categoriaService.findAll());
-	}
+    public ResponseEntity<Page<CategoriaResponseDTO>> findAll(
+            CategoriaFilter categoriaFilter,
+            Pageable pageable,
+            HttpServletRequest request) {
+
+    	QueryParamValidator.validate(request, Set.of("nome"));
+
+        Page<CategoriaResponseDTO> page = categoriaService.findAll(categoriaFilter, pageable);
+        return ResponseEntity.ok(page);
+    }
 	
 	@GetMapping("/findById/{id}")
 	public ResponseEntity<CategoriaResponseDTO> findById(@PathVariable Long id){
