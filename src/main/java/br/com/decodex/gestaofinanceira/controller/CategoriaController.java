@@ -1,5 +1,6 @@
 package br.com.decodex.gestaofinanceira.controller;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -45,6 +46,11 @@ public class CategoriaController {
 
         Page<CategoriaResponseDTO> page = categoriaService.findAll(categoriaFilter, pageable);
         return ResponseEntity.ok(page);
+    }
+	
+	@GetMapping("/listAllSimple")
+    public ResponseEntity<List<CategoriaResponseDTO>> listAllSimple() {
+        return ResponseEntity.ok(categoriaService.findAllSimple());
     }
 	
 	@GetMapping("/findById/{id}")

@@ -1,5 +1,7 @@
 package br.com.decodex.gestaofinanceira.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,13 @@ public class PessoaService {
 	            PessoaSpecification.filtrar(filter),
 	            pageable).map(mapper::toDTO);
 	}
+	
+	@Transactional(readOnly = true)
+    public List<PessoaResponseDTO> findAllSimple() {
+        List<Pessoa> pessoas = pessoaRepository.findAll();
+        
+        return pessoas.stream().map(mapper::toDTO).toList();
+    }
 
 	@Transactional(readOnly = true)
 	public Pessoa findById(Long id) {

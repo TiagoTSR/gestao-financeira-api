@@ -1,5 +1,7 @@
 package br.com.decodex.gestaofinanceira.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -32,6 +34,13 @@ public class CategoriaService {
 	    
 	    return categoriaRepository.findAll(spec, pageable).map(mapper::toDTO);
 	}
+    
+    @Transactional(readOnly = true)
+    public List<CategoriaResponseDTO> findAllSimple() {
+        List<Categoria> categorias = categoriaRepository.findAll();
+        
+        return categorias.stream().map(mapper::toDTO).toList();
+    }
 
     @Transactional(readOnly = true)
     public Categoria findById(Long id) {
