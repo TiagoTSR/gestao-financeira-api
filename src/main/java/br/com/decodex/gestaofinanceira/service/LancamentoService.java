@@ -84,7 +84,7 @@ public class LancamentoService {
         Categoria categoria = categoriaRepository.findById(dto.categoriaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada para o ID: " + dto.categoriaId()));
 
-        mapper.updateEntity(existente, dto);
+        mapper.updateEntity(existente, dto, pessoa, categoria);
 
         existente.setPessoa(pessoa);
         existente.setCategoria(categoria);

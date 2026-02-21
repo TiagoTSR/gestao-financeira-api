@@ -7,17 +7,15 @@ import br.com.decodex.gestaofinanceira.model.TipoLancamento;
 
 public record LancamentoResponseDTO(
 
-        Long id,
+		Long id,
         String descricao,
         LocalDate dataVencimento,
         LocalDate dataPagamento,
         BigDecimal valor,
         String observacao,
         TipoLancamento tipo,
-
         Long categoriaId,
         String categoriaNome,
-
         Long pessoaId,
         String pessoaNome
 ) {}
