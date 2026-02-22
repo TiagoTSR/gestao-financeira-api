@@ -1,6 +1,6 @@
 package br.com.decodex.gestaofinanceira.config;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,15 +52,16 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
 
-        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:4200"));
+        config.setAllowedOriginPatterns(List.of("http://localhost:4200"));
+        config.setExposedHeaders(List.of("Set-Cookie"));
 
-        config.setAllowedHeaders(Arrays.asList(
+        config.setAllowedHeaders(List.of(
                 HttpHeaders.AUTHORIZATION,
                 HttpHeaders.CONTENT_TYPE,
                 HttpHeaders.ACCEPT
         ));
 
-        config.setAllowedMethods(Arrays.asList(
+        config.setAllowedMethods(List.of(
                 HttpMethod.GET.name(),
                 HttpMethod.POST.name(),
                 HttpMethod.PUT.name(),
