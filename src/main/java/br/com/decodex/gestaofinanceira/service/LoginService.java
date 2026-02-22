@@ -6,8 +6,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import br.com.decodex.gestaofinanceira.auth.JwtServiceGenerator;
+import br.com.decodex.gestaofinanceira.dto.AuthData;
 import br.com.decodex.gestaofinanceira.dto.LoginRequest;
-import br.com.decodex.gestaofinanceira.dto.LoginResponse;
 import br.com.decodex.gestaofinanceira.dto.UsuarioResponse;
 import br.com.decodex.gestaofinanceira.model.Usuario;
 import br.com.decodex.gestaofinanceira.repository.UsuarioRepository;
@@ -23,20 +23,17 @@ public class LoginService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public LoginResponse logar(LoginRequest login) {
- 
+    public AuthData autenticar(LoginRequest login) {
+   
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        login.username(), 
-                        login.password()
-                )
+            new UsernamePasswordAuthenticationToken(login.username(), login.password())
         );
-
+        
         Usuario user = repository.findByUsername(login.username())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         String token = jwtService.generateToken(user);
-
-        return new LoginResponse(token, new UsuarioResponse(user));
+        
+        return new AuthData(token, new UsuarioResponse(user));
     }
 }

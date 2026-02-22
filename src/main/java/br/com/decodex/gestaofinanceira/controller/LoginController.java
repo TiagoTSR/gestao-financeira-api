@@ -1,6 +1,10 @@
 package br.com.decodex.gestaofinanceira.controller;
 
+import java.time.Duration;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +25,18 @@ public class LoginController {
     @PostMapping
     public ResponseEntity<LoginResponse> logar(@RequestBody LoginRequest login) {
 
-        LoginResponse response = loginService.logar(login);
-        return ResponseEntity.ok(response);
+    	var authData = loginService.autenticar(login);
+
+        ResponseCookie jwtCookie = ResponseCookie.from("accessToken", authData.token())
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(Duration.ofHours(1))
+                .sameSite("Lax")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .body(new LoginResponse(authData.usuario()));
     }
 }
