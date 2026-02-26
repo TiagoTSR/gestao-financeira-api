@@ -20,7 +20,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtServiceGenerator {
 
-    private static final int HORAS_EXPIRACAO_TOKEN = 1;
+	private static final long MINUTOS_EXPIRACAO_TOKEN = 3;
     private final GestaoApiProperty property;
 
     public JwtServiceGenerator(GestaoApiProperty property) {
@@ -37,7 +37,7 @@ public class JwtServiceGenerator {
                 .claims(claims)
                 .subject(usuario.getUsername())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 3600000L * HORAS_EXPIRACAO_TOKEN))
+                .expiration(new Date(System.currentTimeMillis() + 60000L * MINUTOS_EXPIRACAO_TOKEN))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -45,10 +45,22 @@ public class JwtServiceGenerator {
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-
+    
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        try {
+            final String username = extractUsername(token);
+            return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isTokenValid(String token) {
+        try {
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> resolver) {

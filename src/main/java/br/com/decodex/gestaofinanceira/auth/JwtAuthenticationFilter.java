@@ -36,7 +36,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-    	String jwt = null;
+        if (request.getServletPath().contains("/api/login/refresh")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String jwt = null;
 
         if (request.getCookies() != null) {
             for (var cookie : request.getCookies()) {
@@ -56,7 +61,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             username = jwtService.extractUsername(jwt);
         } catch (Exception ex) {
-   
+        	
             filterChain.doFilter(request, response);
             return;
         }
@@ -80,4 +85,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-}
+ }
