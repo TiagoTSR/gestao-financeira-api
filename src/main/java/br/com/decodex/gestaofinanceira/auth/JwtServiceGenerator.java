@@ -1,6 +1,9 @@
 package br.com.decodex.gestaofinanceira.auth;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +23,9 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtServiceGenerator {
 
-    private static final int HORAS_EXPIRACAO_TOKEN = 1;
+    private static final int HORAS_EXPIRACAO_TOKEN = 0;
+    private static final int DIAS_EXPIRACAO_REFRESH_TOKEN = 0;
+
     private final GestaoApiProperty property;
 
     public JwtServiceGenerator(GestaoApiProperty property) {
@@ -28,16 +33,29 @@ public class JwtServiceGenerator {
     }
 
     public String generateToken(Usuario usuario) {
-       
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", usuario.getId());
         claims.put("role", usuario.getRole());
+        claims.put("type", "access");
 
         return Jwts.builder()
                 .claims(claims)
                 .subject(usuario.getUsername())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 3600000L * HORAS_EXPIRACAO_TOKEN))
+                .expiration(new Date(System.currentTimeMillis() + property.getJwt().getAccessExpirationMs()))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    public String generateRefreshToken(Usuario usuario) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "refresh");
+
+        return Jwts.builder()
+                .claims(claims)
+                .subject(usuario.getUsername())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + property.getJwt().getRefreshExpirationMs()))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -46,9 +64,30 @@ public class JwtServiceGenerator {
         return extractClaim(token, Claims::getSubject);
     }
 
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    public LocalDateTime extractExpirationAsLocalDateTime(String token) {
+        Date expiration = extractExpiration(token);
+        return Instant.ofEpochMilli(expiration.getTime())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+    }
+
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
+
+    public boolean isRefreshTokenValid(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            String type = claims.get("type", String.class);
+            return "refresh".equals(type) && !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> resolver) {
@@ -65,11 +104,10 @@ public class JwtServiceGenerator {
     }
 
     private boolean isTokenExpired(String token) {
-        return extractClaim(token, Claims::getExpiration).before(new Date());
+        return extractExpiration(token).before(new Date());
     }
 
     private SecretKey getSigningKey() {
-  
         return Keys.hmacShaKeyFor(
                 property.getJwt().getSecret().getBytes(StandardCharsets.UTF_8)
         );
