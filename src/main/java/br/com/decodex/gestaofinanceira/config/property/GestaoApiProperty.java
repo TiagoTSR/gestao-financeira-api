@@ -19,10 +19,11 @@ public class GestaoApiProperty {
     /* ================= JWT ================= */
 
     public static class Jwt {
-        /**
-         * Chave secreta JWT (mín. 32 caracteres)
-         */
         private String secret;
+        private Long refreshExpirationDays = 7L;
+        private Long accessExpirationHours = 1L;
+        private int accessExpirationMs = 120000;
+        private int refreshExpirationMs = 300000;
 
         public String getSecret() {
             return secret;
@@ -31,8 +32,40 @@ public class GestaoApiProperty {
         public void setSecret(String secret) {
             this.secret = secret;
         }
-    }
 
+        public Long getRefreshExpirationDays() {
+            return refreshExpirationDays;
+        }
+
+        public void setRefreshExpirationDays(Long refreshExpirationDays) {
+            this.refreshExpirationDays = refreshExpirationDays;
+        }
+
+        public Long getAccessExpirationHours() {
+            return accessExpirationHours;
+        }
+
+        public void setAccessExpirationHours(Long accessExpirationHours) {
+            this.accessExpirationHours = accessExpirationHours;
+        }
+
+		public int getAccessExpirationMs() {
+			return accessExpirationMs;
+		}
+
+		public void setAccessExpirationMs(int accessExpirationMs) {
+			this.accessExpirationMs = accessExpirationMs;
+		}
+
+		public int getRefreshExpirationMs() {
+			return refreshExpirationMs;
+		}
+
+		public void setRefreshExpirationMs(int refreshExpirationMs) {
+			this.refreshExpirationMs = refreshExpirationMs;
+		}
+        
+    }
     /* ================= DATABASE ================= */
 
     public static class Database {
