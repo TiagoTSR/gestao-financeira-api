@@ -20,11 +20,9 @@ public class GestaoApiProperty {
 
     public static class Jwt {
         private String secret;
-        private Long refreshExpirationDays = 7L;
-        private Long accessExpirationHours = 1L;
-        private int accessExpirationMs = 120000;
-        private int refreshExpirationMs = 300000;
-
+        private Long accessExpirationMinutes = 30L;
+        private Long accessExpirationHours = 6L;
+  
         public String getSecret() {
             return secret;
         }
@@ -33,12 +31,12 @@ public class GestaoApiProperty {
             this.secret = secret;
         }
 
-        public Long getRefreshExpirationDays() {
-            return refreshExpirationDays;
+        public Long getAccessExpirationMinutes() {
+            return accessExpirationMinutes;
         }
 
-        public void setRefreshExpirationDays(Long refreshExpirationDays) {
-            this.refreshExpirationDays = refreshExpirationDays;
+        public void setAccessExpirationMinutes(Long accessExpirationMinutes) {
+            this.accessExpirationMinutes = accessExpirationMinutes;
         }
 
         public Long getAccessExpirationHours() {
@@ -48,22 +46,14 @@ public class GestaoApiProperty {
         public void setAccessExpirationHours(Long accessExpirationHours) {
             this.accessExpirationHours = accessExpirationHours;
         }
+        
+        public long getAccessExpirationMillis() {
+            return accessExpirationMinutes * 60 * 1000L;
+        }
 
-		public int getAccessExpirationMs() {
-			return accessExpirationMs;
-		}
-
-		public void setAccessExpirationMs(int accessExpirationMs) {
-			this.accessExpirationMs = accessExpirationMs;
-		}
-
-		public int getRefreshExpirationMs() {
-			return refreshExpirationMs;
-		}
-
-		public void setRefreshExpirationMs(int refreshExpirationMs) {
-			this.refreshExpirationMs = refreshExpirationMs;
-		}
+        public long getRefreshExpirationMillis() {
+            return accessExpirationHours * 24 * 60 * 60 * 1000L;
+        }   	
         
     }
     /* ================= DATABASE ================= */

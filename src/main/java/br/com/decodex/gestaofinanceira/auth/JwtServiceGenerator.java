@@ -23,9 +23,6 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtServiceGenerator {
 
-    private static final int HORAS_EXPIRACAO_TOKEN = 0;
-    private static final int DIAS_EXPIRACAO_REFRESH_TOKEN = 0;
-
     private final GestaoApiProperty property;
 
     public JwtServiceGenerator(GestaoApiProperty property) {
@@ -42,7 +39,7 @@ public class JwtServiceGenerator {
                 .claims(claims)
                 .subject(usuario.getUsername())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + property.getJwt().getAccessExpirationMs()))
+                .expiration(new Date(System.currentTimeMillis() + property.getJwt().getAccessExpirationMillis()))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -55,7 +52,7 @@ public class JwtServiceGenerator {
                 .claims(claims)
                 .subject(usuario.getUsername())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + property.getJwt().getRefreshExpirationMs()))
+                .expiration(new Date(System.currentTimeMillis() + property.getJwt().getRefreshExpirationMillis()))
                 .signWith(getSigningKey())
                 .compact();
     }

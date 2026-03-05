@@ -36,11 +36,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        if (request.getServletPath().contains("/api/login/refresh")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
+    	if (request.getServletPath().contains("/api/login/refresh") || 
+                request.getServletPath().contains("/api/refresh-token")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+    	
         String jwt = null;
 
         if (request.getCookies() != null) {
@@ -52,37 +53,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        if (jwt == null) {
+        if (jwt == null || jwt.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        String username;
+        
+        String username = null;
         try {
+
             username = jwtService.extractUsername(jwt);
-        } catch (Exception ex) {
-        	
-            filterChain.doFilter(request, response);
-            return;
-        }
+            
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
 
-            if (jwtService.isTokenValid(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
+        } catch (Exception ex) {
+            System.err.println("ERRO JWT FILTER: Falha ao processar token. Motivo: " + ex.getMessage());
+            SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);
     }
- }
+}
