@@ -1,5 +1,6 @@
 package br.com.decodex.gestaofinanceira.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -8,12 +9,16 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -25,13 +30,29 @@ public class Usuario implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(name = "username", nullable = false)
+
+    @Column(nullable = false)
     private String username;
-    @Column(name = "password", nullable = false)
+
+    @Column(nullable = false)
     private String password;
-    @Column(name = "role", nullable = false)
+
+    @Column(nullable = false)
     private String role;
+
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
+
+    public void addRefreshToken(RefreshToken refreshToken) {
+        refreshTokens.add(refreshToken);
+        refreshToken.setUsuario(this);
+    }
+
+    public void removeRefreshToken(RefreshToken refreshToken) {
+        refreshTokens.remove(refreshToken);
+        refreshToken.setUsuario(null);
+    }
 
     @Override
     @JsonIgnore
@@ -63,23 +84,18 @@ public class Usuario implements UserDetails {
         return true;
     }
 
-    // getters e setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    @Override
-    public String getPassword() {
-        return password;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    @Override
-    public String getUsername() {
-        return username;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public Long getId() {
-        return id;
-    }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
-    public String getRole() {
-        return role;
-    }
+    public List<RefreshToken> getRefreshTokens() { return refreshTokens; }
+    public void setRefreshTokens(List<RefreshToken> refreshTokens) { this.refreshTokens = refreshTokens; }
 }
