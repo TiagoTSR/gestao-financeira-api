@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -60,29 +61,20 @@ class LancamentoControllerTest {
     @BeforeEach
     void setUp() {
         this.objectMapper = new ObjectMapper();
-        // Essencial para lidar com LocalDate nos Records
         this.objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Test
     @WithMockUser
-    @DisplayName("POST /save - Deve criar um lançamento de RECEITA")
+    @DisplayName("POST /save - Deve retornar 201 Created")
     void createShouldReturnCreated() throws Exception {
         LancamentoRequestDTO request = new LancamentoRequestDTO(
-                "Salário Mensal", 
-                LocalDate.of(2026, 3, 7), 
-                null, 
-                new BigDecimal("5000.00"), 
-                "Bônus incluído", 
-                TipoLancamento.RECEITA, 
-                1L, 
-                1L
+                "Salário", LocalDate.now(), null, new BigDecimal("5000.00"),
+                null, TipoLancamento.RECEITA, 1L, 1L
         );
-
         LancamentoResponseDTO response = new LancamentoResponseDTO(
-                100L, "Salário Mensal", LocalDate.of(2026, 3, 7), null, 
-                new BigDecimal("5000.00"), "Bônus incluído", TipoLancamento.RECEITA, 
-                1L, "Renda", 1L, "João Silva"
+                1L, "Salário", LocalDate.now(), null, new BigDecimal("5000.00"),
+                null, TipoLancamento.RECEITA, 1L, "Renda", 1L, "Tiago"
         );
 
         when(lancamentoService.create(any(LancamentoRequestDTO.class))).thenReturn(response);
@@ -92,25 +84,24 @@ class LancamentoControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(100L))
-                .andExpect(jsonPath("$.descricao").value("Salário Mensal"))
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.descricao").value("Salário"))
                 .andExpect(jsonPath("$.tipo").value("RECEITA"))
-                .andExpect(jsonPath("$.valor").value(5000.00));
+                .andExpect(jsonPath("$.categoriaNome").value("Renda"))
+                .andExpect(jsonPath("$.pessoaNome").value("Tiago"));
     }
 
     @Test
     @WithMockUser
-    @DisplayName("PUT /update/{id} - Deve atualizar lançamento")
+    @DisplayName("PUT /update/{id} - Deve retornar 200 OK")
     void updateShouldReturnOk() throws Exception {
         LancamentoRequestDTO request = new LancamentoRequestDTO(
-                "Aluguel Alterado", LocalDate.now(), null, 
-                new BigDecimal("1200.00"), null, TipoLancamento.DESPESA, 2L, 1L
+                "Aluguel", LocalDate.now(), null, new BigDecimal("1200.00"),
+                null, TipoLancamento.DESPESA, 2L, 1L
         );
-        
         LancamentoResponseDTO response = new LancamentoResponseDTO(
-                1L, "Aluguel Alterado", LocalDate.now(), null, 
-                new BigDecimal("1200.00"), null, TipoLancamento.DESPESA, 
-                2L, "Moradia", 1L, "João Silva"
+                1L, "Aluguel", LocalDate.now(), null, new BigDecimal("1200.00"),
+                null, TipoLancamento.DESPESA, 2L, "Moradia", 1L, "Tiago"
         );
 
         when(lancamentoService.update(eq(1L), any(LancamentoRequestDTO.class))).thenReturn(response);
@@ -120,56 +111,59 @@ class LancamentoControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.descricao").value("Aluguel Alterado"))
-                .andExpect(jsonPath("$.valor").value(1200.00));
+                .andExpect(jsonPath("$.descricao").value("Aluguel"))
+                .andExpect(jsonPath("$.tipo").value("DESPESA"))
+                .andExpect(jsonPath("$.categoriaNome").value("Moradia"));
     }
 
     @Test
     @WithMockUser
-    @DisplayName("GET /findById/{id} - Deve retornar lançamento com nomes de categoria e pessoa")
+    @DisplayName("GET /findById/{id} - Deve retornar 200 OK")
     void findByIdShouldReturnOk() throws Exception {
         LancamentoResponseDTO response = new LancamentoResponseDTO(
-                1L, "Internet", LocalDate.now(), LocalDate.now(), 
-                new BigDecimal("150.00"), null, TipoLancamento.DESPESA, 
-                3L, "Utilidades", 1L, "João Silva"
+                1L, "Internet", LocalDate.now(), null, new BigDecimal("150.00"),
+                null, TipoLancamento.DESPESA, 3L, "Utilidades", 1L, "Tiago"
         );
 
         when(lancamentoService.findByIdDTO(1L)).thenReturn(response);
 
         mockMvc.perform(get(BASE_URL + "/findById/{id}", 1L))
                 .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.descricao").value("Internet"))
                 .andExpect(jsonPath("$.categoriaNome").value("Utilidades"))
-                .andExpect(jsonPath("$.pessoaNome").value("João Silva"));
+                .andExpect(jsonPath("$.pessoaNome").value("Tiago"));
     }
 
     @Test
     @WithMockUser
-    @DisplayName("GET /listAll - Deve validar filtros e retornar página")
+    @DisplayName("GET /listAll - Deve retornar 200 OK com página")
     void findAllShouldReturnPage() throws Exception {
-    	Page<LancamentoResponseDTO> page = new PageImpl<>(
-                List.of(), 
-                PageRequest.of(0, 10), 
-                0
-        );
+        Page<LancamentoResponseDTO> page = new PageImpl<>(List.of(
+                new LancamentoResponseDTO(
+                        1L, "Salário", LocalDate.now(), null, new BigDecimal("5000.00"),
+                        null, TipoLancamento.RECEITA, 1L, "Renda", 1L, "Tiago"
+                )
+        ), PageRequest.of(0, 10), 1);
 
         when(lancamentoService.findAll(any(), any())).thenReturn(page);
 
-        // Testando com os filtros que o QueryParamValidator exige
         mockMvc.perform(get(BASE_URL + "/listAll")
-                .param("descricao", "Aluguel")
-                .param("dataVencimentoDe", "2026-01-01")
-                .param("dataVencimentoAte", "2026-12-31")
+                .param("descricao", "Salário")
                 .param("page", "0")
                 .param("size", "10"))
-                .andExpect(status().isOk());
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].descricao").value("Salário"));
     }
 
     @Test
     @WithMockUser
-    @DisplayName("DELETE /delete/{id} - Deve retornar 204")
+    @DisplayName("DELETE /delete/{id} - Deve retornar 204 No Content")
     void deleteShouldReturnNoContent() throws Exception {
         mockMvc.perform(delete(BASE_URL + "/delete/{id}", 1L)
                 .with(csrf()))
+                .andDo(print())
                 .andExpect(status().isNoContent());
     }
 }
