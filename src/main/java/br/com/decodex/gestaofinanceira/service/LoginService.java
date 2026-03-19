@@ -5,6 +5,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import br.com.decodex.gestaofinanceira.auth.JwtServiceGenerator;
 import br.com.decodex.gestaofinanceira.dto.AuthData;
 import br.com.decodex.gestaofinanceira.dto.LoginRequest;
@@ -30,7 +31,7 @@ public class LoginService {
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         String accessToken = jwtService.generateToken(usuario);
-        // Usa o service de refresh token para criar e salvar
+      
         var refreshTokenEntity = refreshTokenService.createRefreshToken(usuario, dispositivo);
 
         return new AuthData(accessToken, refreshTokenEntity.getToken(), new UsuarioResponse(usuario));

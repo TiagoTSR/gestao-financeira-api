@@ -25,7 +25,7 @@ public class RefreshTokenService {
 
     @Transactional
     public AuthData renovarTokens(String tokenValue) {
-        // 1. Busca e valida existência
+   
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByTokenWithUsuario(tokenValue)
                 .orElseThrow(() -> new InvalidTokenException("Refresh token não encontrado"));
         
@@ -33,7 +33,6 @@ public class RefreshTokenService {
             throw new InvalidTokenException("Token órfão: nenhum usuário associado");
         }
 
-        // 2. Verifica expiração e integridade do JWT
         if (refreshTokenEntity.getDataExpiracao().isBefore(LocalDateTime.now()) || 
             !jwtService.isRefreshTokenValid(tokenValue)) {
             refreshTokenRepository.delete(refreshTokenEntity);
@@ -42,11 +41,9 @@ public class RefreshTokenService {
 
         Usuario usuario = refreshTokenEntity.getUsuario();
 
-        // 3. Gera novos tokens (Refresh Token Rotation)
         String newAccessToken = jwtService.generateToken(usuario);
         String newRefreshToken = jwtService.generateRefreshToken(usuario);
 
-        // 4. Atualiza a entidade existente
         refreshTokenEntity.setToken(newRefreshToken);
         refreshTokenEntity.setDataExpiracao(jwtService.extractExpirationAsLocalDateTime(newRefreshToken));
         refreshTokenRepository.save(refreshTokenEntity);
