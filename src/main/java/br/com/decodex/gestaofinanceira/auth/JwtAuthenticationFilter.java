@@ -2,6 +2,9 @@ package br.com.decodex.gestaofinanceira.auth;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,14 +15,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtServiceGenerator jwtService;
     private final UserDetailsService userDetailsService;
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     public JwtAuthenticationFilter(
             JwtServiceGenerator jwtService,
@@ -35,34 +41,47 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+    	 String path = request.getServletPath();
+        
+    	if (path.equals("/api/login") || path.equals("/api/register") || path.equals("/api/refresh-token")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-    	if (request.getServletPath().contains("/api/login/refresh") || 
-                request.getServletPath().contains("/api/refresh-token")) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-    	
         String jwt = null;
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (request.getCookies() != null) {
-            for (var cookie : request.getCookies()) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwt = authHeader.replace("Bearer ", "").trim();
+
+        } else if (request.getCookies() != null) {
+
+            for (Cookie cookie : request.getCookies()) {
                 if ("accessToken".equals(cookie.getName())) {
-                    jwt = cookie.getValue();
+
+                    String value = cookie.getValue();
+
+                    if (value != null) {
+                        jwt = value
+                                .replace("\"", "")
+                                .replace("[", "")
+                                .replace("]", "")
+                                .trim();
+                    }
+
                     break;
                 }
             }
         }
-
+        
         if (jwt == null || jwt.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
-        
-        String username = null;
-        try {
 
-            username = jwtService.extractUsername(jwt);
-            
+        try {
+            String username = jwtService.extractUsername(jwt);
+
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
@@ -75,13 +94,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             );
 
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
+            
         } catch (Exception ex) {
-            System.err.println("ERRO JWT FILTER: Falha ao processar token. Motivo: " + ex.getMessage());
+
+            logger.warn("Erro ao validar token JWT: {}", ex.getMessage());
+
             SecurityContextHolder.clearContext();
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"error\": \"Token inválido ou expirado\"}");
+            return;
         }
 
         filterChain.doFilter(request, response);
