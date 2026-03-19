@@ -142,6 +142,28 @@ class PessoaControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].nome").value("Pessoa Teste"));
     }
+    
+    @Test
+    @WithMockUser
+    @DisplayName("GET /listAllSimple - Deve retornar lista de pessoas")
+    void listAllSimpleShouldReturnList() throws Exception {
+        EnderecoDTO endereco = new EnderecoDTO("Rua B", "2", null, "Bairro", "00000-000", "SP", "SP");
+        List<PessoaResponseDTO> list = List.of(
+                new PessoaResponseDTO(1L, "João Silva", endereco, true),
+                new PessoaResponseDTO(2L, "Maria Souza", null, false)
+        );
+
+        when(pessoaService.findAllSimple()).thenReturn(list);
+
+        mockMvc.perform(get(BASE_URL + "/listAllSimple"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].nome").value("João Silva"))
+                .andExpect(jsonPath("$[0].ativo").value(true))
+                .andExpect(jsonPath("$[1].id").value(2L))
+                .andExpect(jsonPath("$[1].nome").value("Maria Souza"))
+                .andExpect(jsonPath("$[1].ativo").value(false));
+    }
 
     @Test
     @WithMockUser
