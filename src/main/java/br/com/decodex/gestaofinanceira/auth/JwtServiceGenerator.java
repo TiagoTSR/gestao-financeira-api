@@ -7,6 +7,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
@@ -49,6 +50,7 @@ public class JwtServiceGenerator {
         claims.put("type", "refresh");
 
         return Jwts.builder()
+        		.id(UUID.randomUUID().toString())
                 .claims(claims)
                 .subject(usuario.getUsername())
                 .issuedAt(new Date())
@@ -105,11 +107,19 @@ public class JwtServiceGenerator {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            String cleanedToken = token.replace("\"", "").trim();
+           
+            return Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(cleanedToken) 
+                    .getPayload();
+        } catch (Exception e) {
+            System.err.println("ERRO PARSE JWT: [" + token + "]");
+            e.printStackTrace(); 
+            throw e;
+        }
     }
 
     private boolean isTokenExpired(String token) {
@@ -117,8 +127,7 @@ public class JwtServiceGenerator {
     }
 
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(
-                property.getJwt().getSecret().getBytes(StandardCharsets.UTF_8)
-        );
+        byte[] keyBytes = property.getJwt().getSecret().getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
