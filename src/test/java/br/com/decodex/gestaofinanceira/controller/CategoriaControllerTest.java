@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import java.util.List;
 
@@ -119,6 +121,24 @@ class CategoriaControllerTest {
                 .param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].nome").value("Educação"));
+    }
+    
+    @Test
+    @WithMockUser
+    @DisplayName("PUT /update/{id} - Deve retornar 200 ao atualizar categoria")
+    void updateShouldReturnOk() throws Exception {
+        CategoriaRequestDTO request = new CategoriaRequestDTO("Lazer Atualizado");
+        CategoriaResponseDTO response = new CategoriaResponseDTO(1L, "Lazer Atualizado");
+
+        when(service.update(eq(1L), any(CategoriaRequestDTO.class))).thenReturn(response);
+
+        mockMvc.perform(put(BASE_URL + "/update/{id}", 1L)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.nome").value("Lazer Atualizado"));
     }
 
     @Test
