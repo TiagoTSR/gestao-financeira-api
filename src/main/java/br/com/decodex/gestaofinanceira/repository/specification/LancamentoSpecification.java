@@ -24,6 +24,8 @@ public final class LancamentoSpecification {
             if (filter == null) {
                 return builder.conjunction();
             }
+            
+            query.distinct(true);
 
             if (temTexto(filter.getDescricao())) {
                 String like = "%" + filter.getDescricao().trim().toLowerCase() + "%";
