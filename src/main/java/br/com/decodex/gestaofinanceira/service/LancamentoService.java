@@ -93,9 +93,8 @@ public class LancamentoService {
         return mapper.toDTO(salvo);
     }
 
-
-
     public void delete(Long id) {
-        lancamentoRepository.delete(findById(id));
+        Lancamento lancamento = findById(id);
+        lancamentoRepository.deleteById(lancamento.getId());
     }
 }

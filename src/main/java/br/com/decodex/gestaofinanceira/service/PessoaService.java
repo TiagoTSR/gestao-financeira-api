@@ -84,9 +84,9 @@ public class PessoaService {
 
 	 @Transactional
 	 public void delete(Long id) {
-	    Pessoa entity = pessoaRepository.findById(id)
+	    Pessoa pessoa = pessoaRepository.findById(id)
 	     .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada"));
 
-	    pessoaRepository.delete(entity);
+	    pessoaRepository.deleteById(pessoa.getId());
 	 }
 }

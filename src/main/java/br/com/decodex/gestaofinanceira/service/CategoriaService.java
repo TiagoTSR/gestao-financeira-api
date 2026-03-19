@@ -67,7 +67,7 @@ public class CategoriaService {
     }
 
     public void delete(Long id) {
-    	Categoria existente = findById(id);
-        categoriaRepository.delete(existente);
+    	Categoria categoria = findById(id);
+        categoriaRepository.delete(categoria);
     }
 }
