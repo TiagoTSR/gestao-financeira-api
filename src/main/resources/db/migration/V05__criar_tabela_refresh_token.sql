@@ -1,6 +1,6 @@
 CREATE TABLE refresh_token (
     id BIGINT NOT NULL AUTO_INCREMENT,
-    token VARCHAR(255) NOT NULL,
+    token VARCHAR(512) NOT NULL,
     data_expiracao DATETIME NOT NULL,
     usuario_id BIGINT NOT NULL,
     dispositivo VARCHAR(255),
