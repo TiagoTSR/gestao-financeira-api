@@ -4,31 +4,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import br.com.decodex.gestaofinanceira.auth.JwtServiceGenerator;
 import br.com.decodex.gestaofinanceira.dto.AuthData;
 import br.com.decodex.gestaofinanceira.dto.LoginRequest;
 import br.com.decodex.gestaofinanceira.dto.UsuarioResponse;
-import br.com.decodex.gestaofinanceira.model.RefreshToken;
 import br.com.decodex.gestaofinanceira.model.Usuario;
-import br.com.decodex.gestaofinanceira.repository.RefreshTokenRepository;
 import br.com.decodex.gestaofinanceira.repository.UsuarioRepository;
 
 @Service
 public class LoginService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    @Autowired private UsuarioRepository usuarioRepository;
+    @Autowired private RefreshTokenService refreshTokenService;
+    @Autowired private JwtServiceGenerator jwtService;
+    @Autowired private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
-
-    @Autowired
-    private JwtServiceGenerator jwtService;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
+    @Transactional
     public AuthData autenticar(LoginRequest login, String dispositivo) {
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(login.username(), login.password())
@@ -38,15 +30,9 @@ public class LoginService {
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         String accessToken = jwtService.generateToken(usuario);
-        String refreshTokenString = jwtService.generateRefreshToken(usuario);
+        // Usa o service de refresh token para criar e salvar
+        var refreshTokenEntity = refreshTokenService.createRefreshToken(usuario, dispositivo);
 
-        RefreshToken refreshTokenEntity = new RefreshToken();
-        refreshTokenEntity.setToken(refreshTokenString);
-        refreshTokenEntity.setDataExpiracao(jwtService.extractExpirationAsLocalDateTime(refreshTokenString));
-        refreshTokenEntity.setUsuario(usuario);
-        refreshTokenEntity.setDispositivo(dispositivo);
-        refreshTokenRepository.save(refreshTokenEntity);
-
-        return new AuthData(accessToken, refreshTokenString, new UsuarioResponse(usuario));
+        return new AuthData(accessToken, refreshTokenEntity.getToken(), new UsuarioResponse(usuario));
     }
 }
