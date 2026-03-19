@@ -18,7 +18,7 @@ public class Endereco {
     @Column(name = "bairro", length = 60)
     private String bairro;
 
-    @Column(name = "cep", length = 9)
+    @Column(name = "cep", length = 10)
     private String cep;
 
     @Column(name = "cidade", length = 60)

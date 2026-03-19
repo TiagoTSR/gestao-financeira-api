@@ -20,7 +20,7 @@ public class RefreshToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false,length = 512, unique = true)
     private String token;
 
     @Column(name = "data_expiracao", nullable = false)
