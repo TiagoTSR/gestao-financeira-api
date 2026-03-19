@@ -1,3 +1,3 @@
 package br.com.decodex.gestaofinanceira.dto;
 
-public record AuthData(String token, String refreshToken, UsuarioResponse usuario) {}
+public record AuthData(String accessToken, String refreshToken, UsuarioResponse usuario) {}
