@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKey;
 
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import br.com.decodex.gestaofinanceira.config.property.GestaoApiProperty;
 import br.com.decodex.gestaofinanceira.model.Usuario;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
@@ -25,6 +28,8 @@ import io.jsonwebtoken.security.Keys;
 public class JwtServiceGenerator {
 
     private final GestaoApiProperty property;
+    private static final Logger log = LoggerFactory.getLogger(JwtServiceGenerator.class);
+
 
     public JwtServiceGenerator(GestaoApiProperty property) {
         this.property = property;
@@ -115,9 +120,8 @@ public class JwtServiceGenerator {
                     .build()
                     .parseSignedClaims(cleanedToken) 
                     .getPayload();
-        } catch (Exception e) {
-            System.err.println("ERRO PARSE JWT: [" + token + "]");
-            e.printStackTrace(); 
+        } catch (JwtException e) {
+            log.warn("Erro ao processar JWT - token inválido ou expirado", e);
             throw e;
         }
     }
