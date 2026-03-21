@@ -51,7 +51,7 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
         TypedQuery<LancamentoEstatisticaCategoria> typedQuery = manager.createQuery(query);
         return typedQuery.getResultList();
     }
-
+    
     @Override
     public List<LancamentoEstatisticaDia> porDia(LocalDate inicio, LocalDate fim) {
         CriteriaBuilder cb = manager.getCriteriaBuilder();
