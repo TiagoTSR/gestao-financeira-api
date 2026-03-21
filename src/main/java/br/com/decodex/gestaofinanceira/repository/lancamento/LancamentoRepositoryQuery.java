@@ -8,10 +8,13 @@ import org.springframework.data.domain.Pageable;
 
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaCategoria;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaDia;
+import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaPessoa;
 import br.com.decodex.gestaofinanceira.repository.filter.LancamentoFilter;
 import br.com.decodex.gestaofinanceira.repository.projection.ResumoLancamento;
 
 public interface LancamentoRepositoryQuery {
+	
+	List<LancamentoEstatisticaPessoa> porPessoa(LocalDate inicio, LocalDate fim);
     
     List<LancamentoEstatisticaCategoria> porCategoria(LocalDate inicio, LocalDate fim);
     

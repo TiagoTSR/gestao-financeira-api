@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaCategoria;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaDia;
+import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaPessoa;
 import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoRequestDTO;
 import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoResponseDTO;
 import br.com.decodex.gestaofinanceira.repository.filter.LancamentoFilter;
@@ -41,6 +42,13 @@ public class LancamentoController {
 	
 	public LancamentoController(LancamentoService lancamentoService) {
 		this.lancamentoService = lancamentoService;
+	}
+	
+	@GetMapping("/estatisticas/por-pessoa")
+    public List<LancamentoEstatisticaPessoa> porPessoa(
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
+		return this.lancamentoService.porPessoa(inicio, fim);
 	}
 	
 	@GetMapping("/estatisticas/por-categoria")

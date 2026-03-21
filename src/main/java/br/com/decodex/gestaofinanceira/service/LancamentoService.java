@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaCategoria;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaDia;
+import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaPessoa;
 import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoRequestDTO;
 import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoResponseDTO;
 import br.com.decodex.gestaofinanceira.exceptions.ResourceNotFoundException;
@@ -41,6 +42,11 @@ public class LancamentoService {
 	     this.pessoaRepository = pessoaRepository;
 	     this.categoriaRepository = categoriaRepository;
 	     this.mapper = mapper;
+	}
+	
+	@Transactional(readOnly = true)
+	public List<LancamentoEstatisticaPessoa> porPessoa(LocalDate inicio, LocalDate fim) {
+	    return lancamentoRepository.porPessoa(inicio, fim);
 	}
 	
 	@Transactional(readOnly = true)

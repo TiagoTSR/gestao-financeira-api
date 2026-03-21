@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaCategoria;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaDia;
+import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaPessoa;
 import br.com.decodex.gestaofinanceira.model.Lancamento;
 import br.com.decodex.gestaofinanceira.repository.filter.LancamentoFilter;
 import br.com.decodex.gestaofinanceira.repository.projection.ResumoLancamento;
@@ -28,6 +29,35 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
 
     @PersistenceContext
     private EntityManager manager;
+    
+    public List<LancamentoEstatisticaPessoa> porPessoa(LocalDate inicio, LocalDate fim) {
+        CriteriaBuilder cb = manager.getCriteriaBuilder();
+        CriteriaQuery<LancamentoEstatisticaPessoa> query =
+            cb.createQuery(LancamentoEstatisticaPessoa.class);
+
+        Root<Lancamento> root = query.from(Lancamento.class);
+
+        query.select(cb.construct(
+            LancamentoEstatisticaPessoa.class,
+            root.get("tipo"),
+            root.get("pessoa"),
+            cb.sum(root.get("valor"))
+        ));
+
+        Predicate[] predicates = criarRestricoesPorData(root, cb, inicio, fim);
+        query.where(predicates);
+
+        query.groupBy(
+            root.get("tipo"),
+            root.get("pessoa")
+        );
+
+        TypedQuery<LancamentoEstatisticaPessoa> typedQuery =
+            manager.createQuery(query);
+
+        return typedQuery.getResultList();
+        }
+
 
     @Override
     public List<LancamentoEstatisticaCategoria> porCategoria(LocalDate inicio, LocalDate fim) {
