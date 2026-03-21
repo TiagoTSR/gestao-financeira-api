@@ -10,6 +10,7 @@ public class ApiError {
     private String error;
     private String message;
     private String path;
+    private Long segundosRestantes;
 
     private Map<String, String> fieldErrors;
 
@@ -67,8 +68,16 @@ public class ApiError {
     public Map<String, String> getFieldErrors() {
         return fieldErrors;
     }
+    
+    public Long getSegundosRestantes(){
+    	return segundosRestantes; 
+    }
+    public void setSegundosRestantes(Long segundosRestantes) {
+    	this.segundosRestantes = segundosRestantes; 
+    }
 
     public void setFieldErrors(Map<String, String> fieldErrors) {
         this.fieldErrors = fieldErrors;
-    }
+    }  
+    
 }

@@ -20,18 +20,27 @@ public class LoginService {
     @Autowired private RefreshTokenService refreshTokenService;
     @Autowired private JwtServiceGenerator jwtService;
     @Autowired private AuthenticationManager authenticationManager;
+    @Autowired private LoginRateLimitService rateLimitService; // ✅ novo
 
     @Transactional
     public AuthData autenticar(LoginRequest login, String dispositivo) {
-        authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(login.username(), login.password())
-        );
+
+        rateLimitService.verificar(login.username()); 
+        try {
+            authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(login.username(), login.password())
+            );
+        } catch (Exception e) {
+            rateLimitService.registrarFalha(login.username());
+            throw e;
+        }
+
+        rateLimitService.registrarSucesso(login.username());
 
         Usuario usuario = usuarioRepository.findByUsername(login.username())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         String accessToken = jwtService.generateToken(usuario);
-      
         var refreshTokenEntity = refreshTokenService.createRefreshToken(usuario, dispositivo);
 
         return new AuthData(accessToken, refreshTokenEntity.getToken(), new UsuarioResponse(usuario));

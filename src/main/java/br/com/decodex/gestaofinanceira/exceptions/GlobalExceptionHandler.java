@@ -129,6 +129,21 @@ public class GlobalExceptionHandler {
                 .body(buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error",
                         "An unexpected error occurred", request.getRequestURI()));
     }
+    
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ApiError> handleTooManyRequests(
+            TooManyRequestsException ex, HttpServletRequest request) {
+
+        ApiError error = buildError(
+            HttpStatus.TOO_MANY_REQUESTS,
+            "Too Many Requests",
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        error.setSegundosRestantes(ex.getSegundosRestantes()); // ✅ frontend usa isso para o timer
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(error);
+    }
 
     private ApiError buildError(HttpStatus status, String error, String message, String path) {
         return new ApiError(Instant.now(), status.value(), error, message, path);
