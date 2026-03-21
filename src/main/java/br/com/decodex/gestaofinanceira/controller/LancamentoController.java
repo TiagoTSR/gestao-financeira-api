@@ -1,9 +1,13 @@
 package br.com.decodex.gestaofinanceira.controller;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,11 +18,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaCategoria;
+import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaDia;
 import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoRequestDTO;
 import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoResponseDTO;
 import br.com.decodex.gestaofinanceira.repository.filter.LancamentoFilter;
+import br.com.decodex.gestaofinanceira.repository.projection.ResumoLancamento;
 import br.com.decodex.gestaofinanceira.service.LancamentoService;
 import br.com.decodex.gestaofinanceira.service.QueryParamValidator;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,6 +41,25 @@ public class LancamentoController {
 	
 	public LancamentoController(LancamentoService lancamentoService) {
 		this.lancamentoService = lancamentoService;
+	}
+	
+	@GetMapping("/estatisticas/por-categoria")
+    public List<LancamentoEstatisticaCategoria> porCategoria(
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
+		return this.lancamentoService.porCategoria(inicio, fim);
+	}
+	
+	@GetMapping("/estatisticas/por-dia")
+	public List<LancamentoEstatisticaDia> porDia(
+	        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+	        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
+	    return lancamentoService.porDia(inicio, fim);
+	}
+
+	@GetMapping("/resumo")
+	public Page<ResumoLancamento> resumir(LancamentoFilter lancamentoFilter,@PageableDefault(size = 10) Pageable pageable) {
+	    return lancamentoService.resumir(lancamentoFilter, pageable);
 	}
 	
 	@GetMapping("/listAll")
