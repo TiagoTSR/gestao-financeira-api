@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import br.com.decodex.gestaofinanceira.config.BaseIntegrationTest;
-import br.com.decodex.gestaofinanceira.dto.LoginRequest;
+import br.com.decodex.gestaofinanceira.dto.login.LoginRequest;
 import br.com.decodex.gestaofinanceira.model.Usuario;
 import br.com.decodex.gestaofinanceira.repository.UsuarioRepository;
 import jakarta.servlet.http.Cookie;

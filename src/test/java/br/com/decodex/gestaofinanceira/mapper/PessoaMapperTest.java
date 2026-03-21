@@ -6,9 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import br.com.decodex.gestaofinanceira.dto.EnderecoDTO;
-import br.com.decodex.gestaofinanceira.dto.PessoaRequestDTO;
-import br.com.decodex.gestaofinanceira.dto.PessoaResponseDTO;
+import br.com.decodex.gestaofinanceira.dto.endereco.EnderecoDTO;
+import br.com.decodex.gestaofinanceira.dto.pessoa.PessoaRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.pessoa.PessoaResponseDTO;
 import br.com.decodex.gestaofinanceira.model.Endereco;
 import br.com.decodex.gestaofinanceira.model.Pessoa;
 

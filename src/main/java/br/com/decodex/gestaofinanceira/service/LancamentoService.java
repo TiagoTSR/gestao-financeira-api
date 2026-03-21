@@ -6,8 +6,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.decodex.gestaofinanceira.dto.LancamentoRequestDTO;
-import br.com.decodex.gestaofinanceira.dto.LancamentoResponseDTO;
+import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoResponseDTO;
 import br.com.decodex.gestaofinanceira.exceptions.ResourceNotFoundException;
 import br.com.decodex.gestaofinanceira.mapper.LancamentoMapper;
 import br.com.decodex.gestaofinanceira.model.Categoria;

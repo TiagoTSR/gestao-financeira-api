@@ -10,8 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import br.com.decodex.gestaofinanceira.dto.LancamentoRequestDTO;
-import br.com.decodex.gestaofinanceira.dto.LancamentoResponseDTO;
+import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoResponseDTO;
 import br.com.decodex.gestaofinanceira.model.Categoria;
 import br.com.decodex.gestaofinanceira.model.Lancamento;
 import br.com.decodex.gestaofinanceira.model.Pessoa;

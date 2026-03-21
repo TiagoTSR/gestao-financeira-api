@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import br.com.decodex.gestaofinanceira.auth.JwtServiceGenerator;
-import br.com.decodex.gestaofinanceira.dto.AuthData;
+import br.com.decodex.gestaofinanceira.dto.auth.AuthData;
 import br.com.decodex.gestaofinanceira.exceptions.InvalidTokenException;
 import br.com.decodex.gestaofinanceira.model.RefreshToken;
 import br.com.decodex.gestaofinanceira.model.Usuario;

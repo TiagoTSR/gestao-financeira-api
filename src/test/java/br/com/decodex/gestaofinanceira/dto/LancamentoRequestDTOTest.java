@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoRequestDTO;
 import br.com.decodex.gestaofinanceira.model.TipoLancamento;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;

@@ -2,8 +2,8 @@ package br.com.decodex.gestaofinanceira.mapper;
 
 import org.springframework.stereotype.Component;
 
-import br.com.decodex.gestaofinanceira.dto.CategoriaRequestDTO;
-import br.com.decodex.gestaofinanceira.dto.CategoriaResponseDTO;
+import br.com.decodex.gestaofinanceira.dto.categoria.CategoriaRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.categoria.CategoriaResponseDTO;
 import br.com.decodex.gestaofinanceira.model.Categoria;
 
 @Component

@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.decodex.gestaofinanceira.auth.JwtServiceGenerator;
-import br.com.decodex.gestaofinanceira.dto.AuthData;
-import br.com.decodex.gestaofinanceira.dto.UsuarioResponse;
+import br.com.decodex.gestaofinanceira.dto.auth.AuthData;
+import br.com.decodex.gestaofinanceira.dto.usuario.UsuarioResponse;
 import br.com.decodex.gestaofinanceira.exceptions.InvalidTokenException;
 import br.com.decodex.gestaofinanceira.model.RefreshToken;
 import br.com.decodex.gestaofinanceira.model.Usuario;

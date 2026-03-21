@@ -1,4 +1,4 @@
-package br.com.decodex.gestaofinanceira.dto;
+package br.com.decodex.gestaofinanceira.dto.categoria;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.decodex.gestaofinanceira.dto.CategoriaRequestDTO;
-import br.com.decodex.gestaofinanceira.dto.CategoriaResponseDTO;
+import br.com.decodex.gestaofinanceira.dto.categoria.CategoriaRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.categoria.CategoriaResponseDTO;
 import br.com.decodex.gestaofinanceira.repository.filter.CategoriaFilter;
 import br.com.decodex.gestaofinanceira.service.CategoriaService;
 import br.com.decodex.gestaofinanceira.service.QueryParamValidator;

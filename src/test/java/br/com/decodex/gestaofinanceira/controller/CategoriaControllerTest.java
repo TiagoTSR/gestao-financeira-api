@@ -30,8 +30,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import br.com.decodex.gestaofinanceira.auth.JwtServiceGenerator;
-import br.com.decodex.gestaofinanceira.dto.CategoriaRequestDTO;
-import br.com.decodex.gestaofinanceira.dto.CategoriaResponseDTO;
+import br.com.decodex.gestaofinanceira.dto.categoria.CategoriaRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.categoria.CategoriaResponseDTO;
 import br.com.decodex.gestaofinanceira.service.CategoriaService;
 
 @WebMvcTest(CategoriaController.class)

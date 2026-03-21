@@ -6,8 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import br.com.decodex.gestaofinanceira.dto.AuthData;
-import br.com.decodex.gestaofinanceira.dto.RefreshResponse;
+
+import br.com.decodex.gestaofinanceira.dto.auth.AuthData;
+import br.com.decodex.gestaofinanceira.dto.refresh.RefreshResponse;
 import br.com.decodex.gestaofinanceira.service.RefreshTokenService;
 import br.com.decodex.gestaofinanceira.util.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;

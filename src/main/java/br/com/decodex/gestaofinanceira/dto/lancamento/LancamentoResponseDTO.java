@@ -1,4 +1,4 @@
-package br.com.decodex.gestaofinanceira.dto;
+package br.com.decodex.gestaofinanceira.dto.lancamento;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

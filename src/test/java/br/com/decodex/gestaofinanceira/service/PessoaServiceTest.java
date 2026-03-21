@@ -26,9 +26,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import br.com.decodex.gestaofinanceira.exceptions.ResourceNotFoundException;
 import br.com.decodex.gestaofinanceira.repository.filter.PessoaFilter;
-
-import br.com.decodex.gestaofinanceira.dto.PessoaRequestDTO;
-import br.com.decodex.gestaofinanceira.dto.PessoaResponseDTO;
+import br.com.decodex.gestaofinanceira.dto.pessoa.PessoaRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.pessoa.PessoaResponseDTO;
 import br.com.decodex.gestaofinanceira.mapper.PessoaMapper;
 import br.com.decodex.gestaofinanceira.model.Pessoa;
 import br.com.decodex.gestaofinanceira.repository.PessoaRepository;

@@ -23,8 +23,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-import br.com.decodex.gestaofinanceira.dto.CategoriaRequestDTO;
-import br.com.decodex.gestaofinanceira.dto.CategoriaResponseDTO;
+import br.com.decodex.gestaofinanceira.dto.categoria.CategoriaRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.categoria.CategoriaResponseDTO;
 import br.com.decodex.gestaofinanceira.exceptions.ResourceNotFoundException;
 import br.com.decodex.gestaofinanceira.mapper.CategoriaMapper;
 import br.com.decodex.gestaofinanceira.model.Categoria;

@@ -1,4 +1,4 @@
-package br.com.decodex.gestaofinanceira.dto;
+package br.com.decodex.gestaofinanceira.dto.usuario;
 
 import br.com.decodex.gestaofinanceira.model.Usuario;
 

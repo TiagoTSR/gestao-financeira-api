@@ -34,8 +34,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import br.com.decodex.gestaofinanceira.auth.JwtServiceGenerator;
-import br.com.decodex.gestaofinanceira.dto.LancamentoRequestDTO;
-import br.com.decodex.gestaofinanceira.dto.LancamentoResponseDTO;
+import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoResponseDTO;
 import br.com.decodex.gestaofinanceira.model.TipoLancamento;
 import br.com.decodex.gestaofinanceira.service.LancamentoService;
 

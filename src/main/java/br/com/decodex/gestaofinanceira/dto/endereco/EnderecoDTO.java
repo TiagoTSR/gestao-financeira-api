@@ -1,4 +1,4 @@
-package br.com.decodex.gestaofinanceira.dto;
+package br.com.decodex.gestaofinanceira.dto.endereco;
 
 public record EnderecoDTO(
         String logradouro,

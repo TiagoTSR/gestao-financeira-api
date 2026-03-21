@@ -6,8 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import br.com.decodex.gestaofinanceira.dto.CategoriaRequestDTO;
-import br.com.decodex.gestaofinanceira.dto.CategoriaResponseDTO;
+import br.com.decodex.gestaofinanceira.dto.categoria.CategoriaRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.categoria.CategoriaResponseDTO;
 import br.com.decodex.gestaofinanceira.model.Categoria;
 
 class CategoriaMapperTest {

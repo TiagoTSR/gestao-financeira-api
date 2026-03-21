@@ -7,8 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.decodex.gestaofinanceira.dto.PessoaRequestDTO;
-import br.com.decodex.gestaofinanceira.dto.PessoaResponseDTO;
+import br.com.decodex.gestaofinanceira.dto.pessoa.PessoaRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.pessoa.PessoaResponseDTO;
 import br.com.decodex.gestaofinanceira.exceptions.ResourceNotFoundException;
 import br.com.decodex.gestaofinanceira.mapper.PessoaMapper;
 import br.com.decodex.gestaofinanceira.model.Endereco;
