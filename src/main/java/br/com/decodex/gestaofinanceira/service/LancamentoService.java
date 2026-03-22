@@ -1,7 +1,13 @@
 package br.com.decodex.gestaofinanceira.service;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.sql.Date;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +31,12 @@ import br.com.decodex.gestaofinanceira.repository.PessoaRepository;
 import br.com.decodex.gestaofinanceira.repository.filter.LancamentoFilter;
 import br.com.decodex.gestaofinanceira.repository.projection.ResumoLancamento;
 import br.com.decodex.gestaofinanceira.repository.specification.LancamentoSpecification;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
 public class LancamentoService {
@@ -42,6 +54,29 @@ public class LancamentoService {
 	     this.pessoaRepository = pessoaRepository;
 	     this.categoriaRepository = categoriaRepository;
 	     this.mapper = mapper;
+	}
+	
+	public byte[] relatorioPorPessoa(LocalDate inicio, LocalDate fim) throws Exception {
+	    List<LancamentoEstatisticaPessoa> dados = lancamentoRepository.porPessoa(inicio, fim);
+	    
+	    Map<String, Object> parametros = new HashMap<>();
+	    parametros.put("DT_INICIO", Date.valueOf(inicio));
+	    parametros.put("DT_FIM", Date.valueOf(fim));
+	    parametros.put("REPORT_LOCALE", Locale.of("pt", "BR"));
+	    
+	    InputStream inputStream = this.getClass().getResourceAsStream(
+	            "/relatorios/lancamentos-por-pessoa.jrxml");
+	    
+	    if (inputStream == null) {
+	        throw new FileNotFoundException("Arquivo .jrxml não encontrado em /relatorios/");
+	    }
+
+	    JasperReport jasperReport = JasperCompileManager.compileReport(inputStream);
+	    
+	    JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros,
+	            new JRBeanCollectionDataSource(dados));
+	    
+	    return JasperExportManager.exportReportToPdf(jasperPrint);
 	}
 	
 	@Transactional(readOnly = true)

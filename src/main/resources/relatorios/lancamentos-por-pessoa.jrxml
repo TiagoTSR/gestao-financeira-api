@@ -1,0 +1,69 @@
+<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 7.0.3-41034ca841d452f3305ba55b9042260aaa1ab5dd  -->
+<jasperReport name="lancamaentos-por-pessoa" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="90097725-0f93-4bb7-b63b-e4cae79ed314">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<parameter name="DT_INICIO" class="java.util.Date"/>
+	<parameter name="DT_FIM" class="java.util.Date"/>
+	<query language="sql"><![CDATA[]]></query>
+	<field name="total" class="java.math.BigDecimal"/>
+	<field name="tipo" class="br.com.decodex.gestaofinanceira.model.TipoLancamento"/>
+	<field name="pessoa" class="br.com.decodex.gestaofinanceira.model.Pessoa"/>
+	<title height="79" splitType="Stretch">
+		<element kind="textField" uuid="e0b598fd-bc44-4fec-9ac5-afbe9a7bc521" x="1" y="24" width="552" height="30" fontSize="22.0">
+			<expression><![CDATA["Lançamentos por pessoa "
++ new java.text.SimpleDateFormat("dd/MM/yyyy").format($P{DT_INICIO})
++ " até "
++ new java.text.SimpleDateFormat("dd/MM/yyyy").format($P{DT_FIM})]]></expression>
+		</element>
+	</title>
+	<columnHeader splitType="Stretch"/>
+	<detail>
+		<band height="63" splitType="Stretch">
+			<element kind="line" uuid="080c61bc-7d8c-4a71-8f6a-6059b8b63418" x="-1" y="0" width="554" height="1">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="1060f2d9-955c-444a-9778-ab4139b53d3c" x="-1" y="0" width="555" height="30" backcolor="#CFC8C8"/>
+			<element kind="line" uuid="00008a48-1c54-45bf-a176-2099e9a5a3df" x="479" y="0" width="1" height="30"/>
+			<element kind="line" uuid="7c0910f7-9c3f-4c7e-a787-b7861b569408" x="79" y="0" width="1" height="30"/>
+			<element kind="line" uuid="59d75d1b-7d0d-4e0f-99d5-c110be4e64f3" x="-1" y="31" width="1" height="30">
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="line" uuid="52ab6632-fa58-4ee0-942d-e4b8704d400d" x="79" y="31" width="1" height="30">
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="line" uuid="18453b1a-0680-4c72-bf74-c70d884c4ccb" x="553" y="31" width="1" height="30">
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="line" uuid="24285ef7-1b96-4f66-a14e-0ba82dbb5e11" x="479" y="31" width="1" height="30">
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="staticText" uuid="680ae3d3-cd86-4758-89c5-c08159ce2d3e" x="-1" y="1" width="80" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[Tipo]]></text>
+			</element>
+			<element kind="staticText" uuid="4bbcb6ae-9412-420c-b0a2-037ae8ba9f1b" x="80" y="0" width="398" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[Pessoa]]></text>
+			</element>
+			<element kind="staticText" uuid="eecd64c5-cd8f-4d6e-aba3-fc077e241681" x="480" y="0" width="72" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[Total]]></text>
+			</element>
+			<element kind="textField" uuid="4b206380-68c0-4b88-b64d-b0dde42c7e35" x="-1" y="30" width="80" height="29" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{tipo}.getDescricao()]]></expression>
+			</element>
+			<element kind="textField" uuid="845940bc-8976-4f04-8277-f43760c3bfab" x="80" y="30" width="399" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{pessoa}.getNome()]]></expression>
+			</element>
+			<element kind="textField" uuid="c423420e-6f71-49ed-a348-877744fc285e" x="480" y="31" width="71" height="30" pattern="¤#,##0.00;¤-#,##0.00" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{total}]]></expression>
+			</element>
+			<element kind="line" uuid="9d88ab69-6255-440d-af06-422df64a7e59" x="-1" y="60" width="553" height="1"/>
+		</band>
+	</detail>
+	<pageFooter height="55" splitType="Stretch">
+		<element kind="textField" uuid="26280f2b-1e57-4446-b99c-532ab112b983" x="0" y="15" width="80" height="40" hTextAlign="Center" vTextAlign="Bottom">
+			<expression><![CDATA["Data " + new java.text.SimpleDateFormat("dd/MM/yyyy")
+    .format(new java.util.Date())]]></expression>
+		</element>
+		<element kind="textField" uuid="8507cb99-b0dd-4c02-a012-cae713dbe320" x="479" y="25" width="76" height="30" hTextAlign="Right" vTextAlign="Bottom">
+			<expression><![CDATA[$V{PAGE_NUMBER}]]></expression>
+		</element>
+	</pageFooter>
+</jasperReport>
