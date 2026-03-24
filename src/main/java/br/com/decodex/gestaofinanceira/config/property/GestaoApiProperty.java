@@ -164,6 +164,8 @@ public class GestaoApiProperty {
     public static class S3 {
 		private String accessKeyId;
 		private String secretAccessKey;
+		private String region;
+		private String bucket = "aw-gestao-arquivos";
 
 		public String getAccessKeyId() {
 			return accessKeyId;
@@ -179,6 +181,22 @@ public class GestaoApiProperty {
 
 		public void setSecretAccessKey(String secretAccessKey) {
 			this.secretAccessKey = secretAccessKey;
+		}
+		
+		public String getRegion() {
+			return region;
+		}
+		
+		public void setRegion(String region) {
+			this.region = region;
+		}
+		
+		public String getBucket() {
+			return bucket;
+		}
+
+		public void setBucket(String bucket) {
+			this.bucket = bucket;
 		}
 	}
 }
