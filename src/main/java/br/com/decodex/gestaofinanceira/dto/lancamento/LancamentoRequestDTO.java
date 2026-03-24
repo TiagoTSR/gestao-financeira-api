@@ -29,5 +29,9 @@ public record LancamentoRequestDTO(
         Long categoriaId,
 
         @NotNull
-        Long pessoaId
+        Long pessoaId,
+        
+        String anexo,
+        
+        String urlAnexo
 ) {}

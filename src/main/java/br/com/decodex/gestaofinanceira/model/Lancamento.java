@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -56,6 +57,11 @@ public class Lancamento {
     @ManyToOne
     @JoinColumn(name = "id_pessoa", nullable = false)
     private Pessoa pessoa;
+    
+    private String anexo;
+	
+	@Transient
+	private String urlAnexo;
 
     public Long getId() {
         return id;
@@ -128,6 +134,22 @@ public class Lancamento {
     public void setPessoa(Pessoa pessoa) {
         this.pessoa = pessoa;
     }
+    
+    public String getUrlAnexo() {
+		return urlAnexo;
+	}
+
+	public void setUrlAnexo(String urlAnexo) {
+		this.urlAnexo = urlAnexo;
+	}
+
+	public String getAnexo() {
+		return anexo;
+	}
+
+	public void setAnexo(String anexo) {
+		this.anexo = anexo;
+	}	
 
     @Override
     public boolean equals(Object obj) {
