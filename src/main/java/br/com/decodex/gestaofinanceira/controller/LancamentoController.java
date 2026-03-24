@@ -1,12 +1,11 @@
 package br.com.decodex.gestaofinanceira.controller;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -27,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.decodex.gestaofinanceira.dto.Anexo;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaCategoria;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaDia;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaPessoa;
@@ -36,6 +36,7 @@ import br.com.decodex.gestaofinanceira.repository.filter.LancamentoFilter;
 import br.com.decodex.gestaofinanceira.repository.projection.ResumoLancamento;
 import br.com.decodex.gestaofinanceira.service.LancamentoService;
 import br.com.decodex.gestaofinanceira.service.QueryParamValidator;
+import br.com.decodex.gestaofinanceira.storage.S3;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -46,10 +47,20 @@ public class LancamentoController {
 	
 	private final LancamentoService lancamentoService;
 	
+	@Autowired
+	private S3 s3;
+	
 	public LancamentoController(LancamentoService lancamentoService) {
 		this.lancamentoService = lancamentoService;
 	}
 	
+	@PostMapping(value = "/anexo", consumes = "multipart/form-data")
+	public Anexo uploadAnexo(@RequestParam MultipartFile anexo) throws IOException {
+		String nome = s3.salvarTemporariamente(anexo);
+		return new Anexo(nome, s3.configurarUrl(nome));
+	}
+			
+	/*
 	@PostMapping("/anexo")
 	public String uploadAnexo(@RequestParam MultipartFile anexo) throws IOException {
 		OutputStream out = new FileOutputStream("C:\\Tiago\\anexos--" + anexo.getOriginalFilename());
@@ -57,7 +68,7 @@ public class LancamentoController {
 		out.close();
 		return "ok";
 	}
-	
+	*/
 	@GetMapping("/relatorios/por-pessoa")
 	public ResponseEntity<byte[]> relatorioPorPessoa(
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate inicio,
