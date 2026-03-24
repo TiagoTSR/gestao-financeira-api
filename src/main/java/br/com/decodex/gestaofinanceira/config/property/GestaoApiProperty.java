@@ -8,6 +8,7 @@ public class GestaoApiProperty {
     private final Jwt jwt = new Jwt();
     private final Database database = new Database();
     private final Mail mail = new Mail();
+    private final S3 s3 = new S3();
 
     public Jwt getJwt() {
         return jwt;
@@ -20,6 +21,10 @@ public class GestaoApiProperty {
     public Mail getMail() {
         return mail;
     }
+    
+    public S3 getS3() {
+		return s3;
+	}
 
     /* ================= JWT ================= */
 
@@ -153,6 +158,27 @@ public class GestaoApiProperty {
 
 		public void setPassword(String password) {
 			this.password = password;
+		}
+	}
+    /* ================= AWS ================= */
+    public static class S3 {
+		private String accessKeyId;
+		private String secretAccessKey;
+
+		public String getAccessKeyId() {
+			return accessKeyId;
+		}
+
+		public void setAccessKeyId(String accessKeyId) {
+			this.accessKeyId = accessKeyId;
+		}
+
+		public String getSecretAccessKey() {
+			return secretAccessKey;
+		}
+
+		public void setSecretAccessKey(String secretAccessKey) {
+			this.secretAccessKey = secretAccessKey;
 		}
 	}
 }
