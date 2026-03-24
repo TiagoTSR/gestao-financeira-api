@@ -12,6 +12,7 @@ import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +55,11 @@ public class LancamentoService {
 	     this.pessoaRepository = pessoaRepository;
 	     this.categoriaRepository = categoriaRepository;
 	     this.mapper = mapper;
+	}
+	
+	@Scheduled(cron = "0 0 7 * * *")
+	public void avisarSobreLancamentosVencidos() {
+		System.out.println(">>>>>>>>>>>>>>> Método sendo executado...");
 	}
 	
 	public byte[] relatorioPorPessoa(LocalDate inicio, LocalDate fim) throws Exception {
