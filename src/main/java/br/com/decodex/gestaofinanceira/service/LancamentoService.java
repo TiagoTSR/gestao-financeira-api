@@ -9,12 +9,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaCategoria;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaDia;
@@ -32,6 +35,7 @@ import br.com.decodex.gestaofinanceira.repository.PessoaRepository;
 import br.com.decodex.gestaofinanceira.repository.filter.LancamentoFilter;
 import br.com.decodex.gestaofinanceira.repository.projection.ResumoLancamento;
 import br.com.decodex.gestaofinanceira.repository.specification.LancamentoSpecification;
+import br.com.decodex.gestaofinanceira.storage.S3;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -46,7 +50,10 @@ public class LancamentoService {
 	private final PessoaRepository pessoaRepository;
     private final CategoriaRepository categoriaRepository;
     private final LancamentoMapper mapper;
-	
+    
+    @Autowired
+    private S3 s3;
+    
 	public LancamentoService(LancamentoRepository lancamentoRepository,
 			PessoaRepository pessoaRepository,
             CategoriaRepository categoriaRepository,
@@ -127,22 +134,31 @@ public class LancamentoService {
     }
     
     @Transactional
-    public LancamentoResponseDTO create(LancamentoRequestDTO dto) {
-    	
-    	Pessoa pessoa = pessoaRepository.findById(dto.pessoaId())
-                .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada para o ID: " + dto.pessoaId()));
+    public LancamentoResponseDTO create(LancamentoRequestDTO dto, MultipartFile anexo) {
+
+        Pessoa pessoa = pessoaRepository.findById(dto.pessoaId())
+                .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada: " + dto.pessoaId()));
 
         Categoria categoria = categoriaRepository.findById(dto.categoriaId())
-                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada para o ID: " + dto.categoriaId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada: " + dto.categoriaId()));
+
+        String urlAnexo = dto.urlAnexo();
+        String nomeAnexo = dto.anexo();
+
+        if (anexo != null && !anexo.isEmpty()) {
+            urlAnexo = s3.salvarTemporariamente(anexo);
+            nomeAnexo = anexo.getOriginalFilename();
+        }
 
         Lancamento lancamento = mapper.toEntity(dto, pessoa, categoria);
-        Lancamento salvo = lancamentoRepository.save(lancamento);
-        
-        return mapper.toDTO(salvo);
+        lancamento.setUrlAnexo(urlAnexo);
+        lancamento.setAnexo(nomeAnexo);
+
+        return mapper.toDTO(lancamentoRepository.save(lancamento));
     }
     
     @Transactional
-    public LancamentoResponseDTO update(Long id, LancamentoRequestDTO dto) {
+    public LancamentoResponseDTO update(Long id, LancamentoRequestDTO dto, MultipartFile anexo) {
 
         Lancamento existente = findById(id);
 
@@ -152,13 +168,27 @@ public class LancamentoService {
         Categoria categoria = categoriaRepository.findById(dto.categoriaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada para o ID: " + dto.categoriaId()));
 
+        String urlAnexo = dto.urlAnexo();
+        String nomeAnexo = dto.anexo();
+
+        if (anexo != null && !anexo.isEmpty()) {
+   
+            nomeAnexo = s3.salvarTemporariamente(anexo);
+            urlAnexo = s3.configurarUrl(nomeAnexo);
+        }
+
+        if (StringUtils.hasText(nomeAnexo)) {
+            s3.create(nomeAnexo);
+        }
+
         mapper.updateEntity(existente, dto, pessoa, categoria);
 
         existente.setPessoa(pessoa);
         existente.setCategoria(categoria);
+        existente.setAnexo(nomeAnexo);
+        existente.setUrlAnexo(urlAnexo);
 
-        Lancamento salvo = lancamentoRepository.save(existente);
-        return mapper.toDTO(salvo);
+        return mapper.toDTO(lancamentoRepository.save(existente));
     }
 
     public void delete(Long id) {

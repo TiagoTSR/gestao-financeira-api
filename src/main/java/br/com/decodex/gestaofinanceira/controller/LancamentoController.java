@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -123,16 +124,32 @@ public class LancamentoController {
 		return ResponseEntity.ok(lancamentoService.findByIdDTO(id));
 	}
 	
-	@PostMapping("/save")
+	@PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<LancamentoResponseDTO> create(@Valid @RequestBody LancamentoRequestDTO dto) {
-		LancamentoResponseDTO created = lancamentoService.create(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    }
+	    return ResponseEntity.status(HttpStatus.CREATED).body(lancamentoService.create(dto, null));
+	}
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<LancamentoResponseDTO> update(@PathVariable Long id,@Valid @RequestBody LancamentoRequestDTO dto) {
-        return ResponseEntity.ok(lancamentoService.update(id, dto));
-    }
+	@PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<LancamentoResponseDTO> createComAnexo(
+	        @RequestPart("dados") @Valid LancamentoRequestDTO dto,
+	        @RequestPart(value = "anexo", required = false) MultipartFile anexo) {
+	    return ResponseEntity.status(HttpStatus.CREATED).body(lancamentoService.create(dto, anexo));
+	}
+
+	@PutMapping(value = "/update/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<LancamentoResponseDTO> update(
+	        @PathVariable Long id,
+	        @Valid @RequestBody LancamentoRequestDTO dto) {
+	    return ResponseEntity.ok(lancamentoService.update(id, dto, null));
+	}
+
+	@PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<LancamentoResponseDTO> updateComAnexo(
+	        @PathVariable Long id,
+	        @RequestPart("dados") @Valid LancamentoRequestDTO dto,
+	        @RequestPart(value = "anexo", required = false) MultipartFile anexo) {
+	    return ResponseEntity.ok(lancamentoService.update(id, dto, anexo));
+	}
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
