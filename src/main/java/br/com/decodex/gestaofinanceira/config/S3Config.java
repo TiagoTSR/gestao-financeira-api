@@ -1,7 +1,6 @@
 package br.com.decodex.gestaofinanceira.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,25 +22,12 @@ public class S3Config {
     @Autowired
     private GestaoApiProperty property;
     
-    @Value("${gerencia.s3.accessKeyId}")
-    private String accessKeyId;
-
-    @Value("${gerencia.s3.secretAccessKey}")
-    private String secretAccessKey;
-
-    @Value("${gerencia.s3.bucket}")
-    private String bucket;
-
-    @Value("${gerencia.s3.region}")
-    private String region;
-  
     @Bean
     public S3Client s3Client() {
         // Verificando se as variáveis estão sendo lidas corretamente
         String accessKeyId = property.getS3().getAccessKeyId();
         String secretAccessKey = property.getS3().getSecretAccessKey();
         String bucketName = property.getS3().getBucket();
-
         
         if (accessKeyId == null || secretAccessKey == null || bucketName == null) {
             throw new IllegalArgumentException("AWS Credentials or Bucket Name are missing in the configuration.");
