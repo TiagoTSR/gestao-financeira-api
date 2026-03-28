@@ -1,6 +1,5 @@
 package br.com.decodex.gestaofinanceira.mapper;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
@@ -40,14 +39,16 @@ class LancamentoMapperTest {
     @DisplayName("Deve converter LancamentoRequestDTO para Entidade com relacionamentos")
     void toEntityShouldMapAllFieldsAndRelationships() {
         LancamentoRequestDTO dto = new LancamentoRequestDTO(
-                "Supermercado", 
-                LocalDate.now(), 
-                null, 
-                new BigDecimal("150.00"), 
-                "Compra do mês", 
-                TipoLancamento.DESPESA, 
-                2L, 
-                1L
+                "Supermercado",
+                LocalDate.now(),
+                null,
+                new BigDecimal("150.00"),
+                "Compra do mês",
+                TipoLancamento.DESPESA,
+                2L,
+                1L,
+                null,   // anexo
+                null    // urlAnexo
         );
 
         Lancamento result = mapper.toEntity(dto, pessoa, categoria);
@@ -77,7 +78,6 @@ class LancamentoMapperTest {
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(10L);
         assertThat(result.descricao()).isEqualTo("Salário");
-        
         assertThat(result.pessoaId()).isEqualTo(1L);
         assertThat(result.pessoaNome()).isEqualTo("Maria Silva");
         assertThat(result.categoriaId()).isEqualTo(2L);
@@ -92,8 +92,10 @@ class LancamentoMapperTest {
         existente.setDescricao("Antigo");
 
         LancamentoRequestDTO dto = new LancamentoRequestDTO(
-                "Novo", LocalDate.now(), null, new BigDecimal("10.00"), 
-                null, TipoLancamento.RECEITA, 2L, 1L
+                "Novo", LocalDate.now(), null, new BigDecimal("10.00"),
+                null, TipoLancamento.RECEITA, 2L, 1L,
+                null,   // anexo
+                null    // urlAnexo
         );
 
         mapper.updateEntity(existente, dto, pessoa, categoria);

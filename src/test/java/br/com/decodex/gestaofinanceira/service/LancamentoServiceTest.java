@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,7 +27,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.mockito.ArgumentMatchers;
 
 import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoRequestDTO;
 import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoResponseDTO;
@@ -40,6 +40,7 @@ import br.com.decodex.gestaofinanceira.repository.CategoriaRepository;
 import br.com.decodex.gestaofinanceira.repository.LancamentoRepository;
 import br.com.decodex.gestaofinanceira.repository.PessoaRepository;
 import br.com.decodex.gestaofinanceira.repository.filter.LancamentoFilter;
+import br.com.decodex.gestaofinanceira.storage.S3;
 
 @ExtendWith(MockitoExtension.class)
 class LancamentoServiceTest {
@@ -52,6 +53,8 @@ class LancamentoServiceTest {
     private CategoriaRepository categoriaRepository;
     @Mock
     private LancamentoMapper mapper;
+    @Mock
+    private S3 s3;
 
     @InjectMocks
     private LancamentoService service;
@@ -79,8 +82,9 @@ class LancamentoServiceTest {
         lancamento.setCategoria(categoria);
 
         requestDTO = new LancamentoRequestDTO(
-                "Cinema", LocalDate.now(), null, new BigDecimal("50.00"), 
-                null, TipoLancamento.DESPESA, 1L, 1L
+                "Cinema", LocalDate.now(), null, new BigDecimal("50.00"),
+                null, TipoLancamento.DESPESA, 1L, 1L,
+                null, null  // anexo, urlAnexo
         );
 
         responseDTO = new LancamentoResponseDTO(
@@ -92,17 +96,15 @@ class LancamentoServiceTest {
     @Test
     @DisplayName("Deve criar um lançamento com sucesso quando pessoa e categoria existem")
     void createShouldReturnResponseDTOWhenDataIsValid() {
-        // Arrange (Configuração dos mocks)
         when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
         when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
         when(mapper.toEntity(any(), any(), any())).thenReturn(lancamento);
         when(lancamentoRepository.save(any())).thenReturn(lancamento);
         when(mapper.toDTO(any())).thenReturn(responseDTO);
 
-        // Act
-        LancamentoResponseDTO result = service.create(requestDTO);
+        // Passa null para MultipartFile (sem anexo)
+        LancamentoResponseDTO result = service.create(requestDTO, null);
 
-        // Assert
         assertThat(result).isNotNull();
         assertThat(result.descricao()).isEqualTo("Cinema");
         verify(lancamentoRepository).save(any());
@@ -113,10 +115,23 @@ class LancamentoServiceTest {
     void createShouldThrowExceptionWhenPessoaDoesNotExist() {
         when(pessoaRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.create(requestDTO))
+        assertThatThrownBy(() -> service.create(requestDTO, null))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Pessoa não encontrada");
-        
+
+        verify(lancamentoRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao criar lançamento com categoria inexistente")
+    void createShouldThrowExceptionWhenCategoriaDoesNotExist() {
+        when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.create(requestDTO, null))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("Categoria não encontrada");
+
         verify(lancamentoRepository, never()).save(any());
     }
 
@@ -129,29 +144,6 @@ class LancamentoServiceTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1L);
-    }
-
-    @Test
-    @DisplayName("Deve deletar lançamento com sucesso")
-    void deleteShouldCallRepositoryWhenIdExists() {
-        when(lancamentoRepository.findById(1L)).thenReturn(Optional.of(lancamento));
-
-        service.delete(1L);
-
-        verify(lancamentoRepository, times(1)).deleteById(1L);
-    }
-    
-    @Test
-    @DisplayName("Deve lançar exceção ao criar lançamento com categoria inexistente")
-    void createShouldThrowExceptionWhenCategoriaDoesNotExist() {
-        when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> service.create(requestDTO))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Categoria não encontrada");
-
-        verify(lancamentoRepository, never()).save(any());
     }
 
     @Test
@@ -183,7 +175,8 @@ class LancamentoServiceTest {
     void updateShouldReturnUpdatedResponseDTO() {
         LancamentoRequestDTO updateRequest = new LancamentoRequestDTO(
                 "Teatro", LocalDate.now(), null, new BigDecimal("80.00"),
-                null, TipoLancamento.DESPESA, 1L, 1L
+                null, TipoLancamento.DESPESA, 1L, 1L,
+                null, null  // anexo, urlAnexo
         );
         LancamentoResponseDTO updatedResponse = new LancamentoResponseDTO(
                 1L, "Teatro", LocalDate.now(), null, new BigDecimal("80.00"),
@@ -196,7 +189,8 @@ class LancamentoServiceTest {
         when(lancamentoRepository.save(any())).thenReturn(lancamento);
         when(mapper.toDTO(any())).thenReturn(updatedResponse);
 
-        LancamentoResponseDTO result = service.update(1L, updateRequest);
+        // Passa null para MultipartFile (sem anexo)
+        LancamentoResponseDTO result = service.update(1L, updateRequest, null);
 
         assertThat(result).isNotNull();
         assertThat(result.descricao()).isEqualTo("Teatro");
@@ -210,7 +204,7 @@ class LancamentoServiceTest {
     void updateShouldThrowExceptionWhenLancamentoDoesNotExist() {
         when(lancamentoRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.update(99L, requestDTO))
+        assertThatThrownBy(() -> service.update(99L, requestDTO, null))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Lançamento não encontrado para o ID: 99");
 
@@ -223,7 +217,7 @@ class LancamentoServiceTest {
         when(lancamentoRepository.findById(1L)).thenReturn(Optional.of(lancamento));
         when(pessoaRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.update(1L, requestDTO))
+        assertThatThrownBy(() -> service.update(1L, requestDTO, null))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Pessoa não encontrada");
 
@@ -237,11 +231,21 @@ class LancamentoServiceTest {
         when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
         when(categoriaRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.update(1L, requestDTO))
+        assertThatThrownBy(() -> service.update(1L, requestDTO, null))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Categoria não encontrada");
 
         verify(lancamentoRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve deletar lançamento com sucesso")
+    void deleteShouldCallRepositoryWhenIdExists() {
+        when(lancamentoRepository.findById(1L)).thenReturn(Optional.of(lancamento));
+
+        service.delete(1L);
+
+        verify(lancamentoRepository, times(1)).deleteById(1L);
     }
 
     @Test
@@ -262,7 +266,7 @@ class LancamentoServiceTest {
         Page<Lancamento> page = new PageImpl<>(List.of(lancamento), PageRequest.of(0, 10), 1);
 
         when(lancamentoRepository.findAll(
-                ArgumentMatchers.<Specification<Lancamento>>any(), 
+                ArgumentMatchers.<Specification<Lancamento>>any(),
                 any(Pageable.class)))
                 .thenReturn(page);
         when(mapper.toDTO(lancamento)).thenReturn(responseDTO);

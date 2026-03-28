@@ -2,6 +2,7 @@ package br.com.decodex.gestaofinanceira.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -38,6 +39,7 @@ import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoRequestDTO;
 import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoResponseDTO;
 import br.com.decodex.gestaofinanceira.model.TipoLancamento;
 import br.com.decodex.gestaofinanceira.service.LancamentoService;
+import br.com.decodex.gestaofinanceira.storage.S3;
 
 @WebMvcTest(LancamentoController.class)
 class LancamentoControllerTest {
@@ -56,6 +58,10 @@ class LancamentoControllerTest {
     @MockitoBean
     private UserDetailsService userDetailsService;
 
+    // S3 é @Autowired no controller, precisa ser mockado no contexto do @WebMvcTest
+    @MockitoBean
+    private S3 s3;
+
     private final String BASE_URL = "/api/lancamentos";
 
     @BeforeEach
@@ -70,14 +76,17 @@ class LancamentoControllerTest {
     void createShouldReturnCreated() throws Exception {
         LancamentoRequestDTO request = new LancamentoRequestDTO(
                 "Salário", LocalDate.now(), null, new BigDecimal("5000.00"),
-                null, TipoLancamento.RECEITA, 1L, 1L
+                null, TipoLancamento.RECEITA, 1L, 1L,
+                null, null  // anexo, urlAnexo
         );
         LancamentoResponseDTO response = new LancamentoResponseDTO(
                 1L, "Salário", LocalDate.now(), null, new BigDecimal("5000.00"),
                 null, TipoLancamento.RECEITA, 1L, "Renda", 1L, "Tiago"
         );
 
-        when(lancamentoService.create(any(LancamentoRequestDTO.class))).thenReturn(response);
+        // O controller chama service.create(dto, null) — MultipartFile é null no endpoint /save
+        when(lancamentoService.create(any(LancamentoRequestDTO.class), isNull()))
+                .thenReturn(response);
 
         mockMvc.perform(post(BASE_URL + "/save")
                 .with(csrf())
@@ -97,14 +106,17 @@ class LancamentoControllerTest {
     void updateShouldReturnOk() throws Exception {
         LancamentoRequestDTO request = new LancamentoRequestDTO(
                 "Aluguel", LocalDate.now(), null, new BigDecimal("1200.00"),
-                null, TipoLancamento.DESPESA, 2L, 1L
+                null, TipoLancamento.DESPESA, 2L, 1L,
+                null, null  // anexo, urlAnexo
         );
         LancamentoResponseDTO response = new LancamentoResponseDTO(
                 1L, "Aluguel", LocalDate.now(), null, new BigDecimal("1200.00"),
                 null, TipoLancamento.DESPESA, 2L, "Moradia", 1L, "Tiago"
         );
 
-        when(lancamentoService.update(eq(1L), any(LancamentoRequestDTO.class))).thenReturn(response);
+        // O controller chama service.update(id, dto, null) — MultipartFile é null no endpoint /update/{id}
+        when(lancamentoService.update(eq(1L), any(LancamentoRequestDTO.class), isNull()))
+                .thenReturn(response);
 
         mockMvc.perform(put(BASE_URL + "/update/{id}", 1L)
                 .with(csrf())
