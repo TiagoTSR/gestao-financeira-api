@@ -157,7 +157,6 @@ public class LancamentoService {
         return mapper.toDTO(lancamentoRepository.save(lancamento));
     }
     
-    @Transactional
     public LancamentoResponseDTO update(Long id, LancamentoRequestDTO dto, MultipartFile anexo) {
 
         Lancamento existente = findById(id);
@@ -168,17 +167,24 @@ public class LancamentoService {
         Categoria categoria = categoriaRepository.findById(dto.categoriaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada para o ID: " + dto.categoriaId()));
 
-        String urlAnexo = dto.urlAnexo();
-        String nomeAnexo = dto.anexo();
+        String urlAnexo = existente.getUrlAnexo();
+        String nomeAnexo = existente.getAnexo();
 
         if (anexo != null && !anexo.isEmpty()) {
-   
             nomeAnexo = s3.salvarTemporariamente(anexo);
             urlAnexo = s3.configurarUrl(nomeAnexo);
-        }
 
-        if (StringUtils.hasText(nomeAnexo)) {
-            s3.create(nomeAnexo);
+            if (StringUtils.hasText(existente.getAnexo())) {
+                s3.remove(existente.getAnexo());
+            }
+            
+            if (dto.anexo() == null && dto.urlAnexo() == null) {
+                if (StringUtils.hasText(existente.getAnexo())) {
+                    s3.remove(existente.getAnexo());
+                }
+                nomeAnexo = null;
+                urlAnexo = null;
+            }
         }
 
         mapper.updateEntity(existente, dto, pessoa, categoria);
@@ -190,7 +196,7 @@ public class LancamentoService {
 
         return mapper.toDTO(lancamentoRepository.save(existente));
     }
-
+    
     public void delete(Long id) {
         Lancamento lancamento = findById(id);
         lancamentoRepository.deleteById(lancamento.getId());
