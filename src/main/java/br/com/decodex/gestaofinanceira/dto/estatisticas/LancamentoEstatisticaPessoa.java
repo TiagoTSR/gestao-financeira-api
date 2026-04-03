@@ -1,7 +1,5 @@
 package br.com.decodex.gestaofinanceira.dto.estatisticas;
 
-import java.math.BigDecimal;
-
 import br.com.decodex.gestaofinanceira.model.Pessoa;
 import br.com.decodex.gestaofinanceira.model.TipoLancamento;
 
@@ -11,9 +9,9 @@ public class LancamentoEstatisticaPessoa {
 
 	private Pessoa pessoa;
 
-	private BigDecimal total;
+	private Long total;
 
-	public LancamentoEstatisticaPessoa(TipoLancamento tipo, Pessoa pessoa, BigDecimal total) {
+	public LancamentoEstatisticaPessoa(TipoLancamento tipo, Pessoa pessoa, Long total) {
 		this.tipo = tipo;
 		this.pessoa = pessoa;
 		this.total = total;
@@ -35,11 +33,11 @@ public class LancamentoEstatisticaPessoa {
 		this.pessoa = pessoa;
 	}
 
-	public BigDecimal getTotal() {
+	public Long getTotal() {
 		return total;
 	}
 
-	public void setTotal(BigDecimal total) {
+	public void setTotal(Long total) {
 		this.total = total;
 	}
 }
