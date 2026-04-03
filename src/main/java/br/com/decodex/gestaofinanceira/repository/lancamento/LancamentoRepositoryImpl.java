@@ -41,7 +41,7 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
             LancamentoEstatisticaPessoa.class,
             root.get("tipo"),
             root.get("pessoa"),
-            cb.sum(root.get("valor"))
+            cb.count(root)
         ));
 
         Predicate[] predicates = criarRestricoesPorData(root, cb, inicio, fim);
@@ -70,7 +70,7 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
         query.select(cb.construct(
             LancamentoEstatisticaCategoria.class,
             root.get("categoria"),
-            cb.sum(root.get("valor"))
+            cb.count(root)
         ));
         
         Predicate[] predicates = criarRestricoes(root, cb, inicio, fim);
