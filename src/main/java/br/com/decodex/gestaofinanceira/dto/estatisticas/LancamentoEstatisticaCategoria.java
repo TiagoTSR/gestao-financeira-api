@@ -1,16 +1,18 @@
 package br.com.decodex.gestaofinanceira.dto.estatisticas;
 
+import java.math.BigDecimal;
+
 import br.com.decodex.gestaofinanceira.model.Categoria;
 
 public class LancamentoEstatisticaCategoria {
 	
 	private Categoria categoria;
 	
-	private Long total;
+	private BigDecimal total;
 
-	public LancamentoEstatisticaCategoria(Categoria categoria, Long total) {
+	public LancamentoEstatisticaCategoria(Categoria categoria, BigDecimal  total) {
 		this.categoria = categoria;
-		this.total = total;
+		this.total = total != null ? total : BigDecimal.ZERO;
 	}
 
 	public Categoria getCategoria() {
@@ -21,11 +23,11 @@ public class LancamentoEstatisticaCategoria {
 		this.categoria = categoria;
 	}
 
-	public Long getTotal() {
+	public BigDecimal  getTotal() {
 		return total;
 	}
 
-	public void setTotal(Long total) {
+	public void setTotal(BigDecimal  total) {
 		this.total = total;
 	}
 }
