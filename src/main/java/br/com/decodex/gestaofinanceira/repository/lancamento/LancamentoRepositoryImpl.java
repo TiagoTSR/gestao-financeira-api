@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaCategoria;
+import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaCategoriaQuantidade;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaDia;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaPessoa;
 import br.com.decodex.gestaofinanceira.model.Lancamento;
@@ -41,7 +42,7 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
             LancamentoEstatisticaPessoa.class,
             root.get("tipo"),
             root.get("pessoa"),
-            cb.count(root)
+            cb.sum(root.get("valor"))
         ));
 
         Predicate[] predicates = criarRestricoesPorData(root, cb, inicio, fim);
@@ -70,7 +71,7 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
         query.select(cb.construct(
             LancamentoEstatisticaCategoria.class,
             root.get("categoria"),
-            cb.count(root)
+            cb.sum(root.get("valor"))
         ));
         
         Predicate[] predicates = criarRestricoes(root, cb, inicio, fim);
@@ -80,6 +81,27 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
         
         TypedQuery<LancamentoEstatisticaCategoria> typedQuery = manager.createQuery(query);
         return typedQuery.getResultList();
+    }
+    
+    public List<LancamentoEstatisticaCategoriaQuantidade> porCategoriaQuantidade(LocalDate inicio, LocalDate fim) {
+        CriteriaBuilder cb = manager.getCriteriaBuilder();
+        CriteriaQuery<LancamentoEstatisticaCategoriaQuantidade> query =
+            cb.createQuery(LancamentoEstatisticaCategoriaQuantidade.class);
+
+        Root<Lancamento> root = query.from(Lancamento.class);
+
+        query.select(cb.construct(
+            LancamentoEstatisticaCategoriaQuantidade.class,
+            root.get("categoria"),
+            cb.count(root)
+        ));
+
+        Predicate[] predicates = criarRestricoes(root, cb, inicio, fim);
+        query.where(predicates);
+
+        query.groupBy(root.get("categoria"));
+
+        return manager.createQuery(query).getResultList();
     }
     
     @Override
