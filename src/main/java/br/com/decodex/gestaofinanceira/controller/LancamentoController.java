@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import br.com.decodex.gestaofinanceira.dto.Anexo;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaCategoria;
+import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaCategoriaQuantidade;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaDia;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaPessoa;
 import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoRequestDTO;
@@ -93,6 +94,13 @@ public class LancamentoController {
     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
 		return this.lancamentoService.porCategoria(inicio, fim);
+	}
+	
+	@GetMapping("/estatisticas/por-categoria-quantidade")
+	public List<LancamentoEstatisticaCategoriaQuantidade> porCategoriaQuantidade(
+			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+		    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
+				return this.lancamentoService.porCategoriaQuantidade(inicio, fim);
 	}
 	
 	@GetMapping("/estatisticas/por-dia")

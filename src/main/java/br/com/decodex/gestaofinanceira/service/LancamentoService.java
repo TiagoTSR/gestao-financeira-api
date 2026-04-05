@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaCategoria;
+import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaCategoriaQuantidade;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaDia;
 import br.com.decodex.gestaofinanceira.dto.estatisticas.LancamentoEstatisticaPessoa;
 import br.com.decodex.gestaofinanceira.dto.lancamento.LancamentoRequestDTO;
@@ -100,6 +101,11 @@ public class LancamentoService {
 	@Transactional(readOnly = true)
 	public List<LancamentoEstatisticaCategoria> porCategoria(LocalDate inicio, LocalDate fim) {
 	    return lancamentoRepository.porCategoria(inicio, fim);
+	}
+	
+	@Transactional(readOnly = true)
+	public List<LancamentoEstatisticaCategoriaQuantidade> porCategoriaQuantidade(LocalDate inicio, LocalDate fim) {
+	    return lancamentoRepository.porCategoriaQuantidade(inicio, fim);
 	}
 	
 	@Transactional(readOnly = true)
