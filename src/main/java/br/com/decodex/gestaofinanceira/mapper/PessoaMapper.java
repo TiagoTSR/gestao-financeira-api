@@ -1,10 +1,17 @@
 package br.com.decodex.gestaofinanceira.mapper;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Component;
 
+import br.com.decodex.gestaofinanceira.dto.contato.ContatoRequestDTO;
+import br.com.decodex.gestaofinanceira.dto.contato.ContatoResponseDTO;
 import br.com.decodex.gestaofinanceira.dto.endereco.EnderecoDTO;
 import br.com.decodex.gestaofinanceira.dto.pessoa.PessoaRequestDTO;
 import br.com.decodex.gestaofinanceira.dto.pessoa.PessoaResponseDTO;
+import br.com.decodex.gestaofinanceira.model.Contato;
 import br.com.decodex.gestaofinanceira.model.Endereco;
 import br.com.decodex.gestaofinanceira.model.Pessoa;
 
@@ -16,6 +23,15 @@ public class PessoaMapper {
         pessoa.setNome(dto.nome());
         pessoa.setAtivo(dto.ativo());
         pessoa.setEndereco(toEnderecoEntity(dto.endereco()));
+        
+        // Converte e vincula os contatos
+        if (dto.contatos() != null) {
+            List<Contato> contatos = dto.contatos().stream()
+                    .map(c -> toContatoEntity(c, pessoa))
+                    .collect(Collectors.toList());
+            pessoa.setContatos(contatos);
+        }
+        
         return pessoa;
     }
 
@@ -23,22 +39,41 @@ public class PessoaMapper {
         pessoa.setNome(dto.nome());
         pessoa.setAtivo(dto.ativo());
         pessoa.setEndereco(toEnderecoEntity(dto.endereco()));
+        
+        if (pessoa.getContatos() != null) {
+            pessoa.getContatos().clear();
+            if (dto.contatos() != null) {
+                pessoa.getContatos().addAll(
+                    dto.contatos().stream()
+                        .map(c -> toContatoEntity(c, pessoa))
+                        .toList()
+                );
+            }
+        }
     }
 
     public PessoaResponseDTO toDTO(Pessoa entity) {
+        List<ContatoResponseDTO> contatosDTO = new ArrayList<>();
+        
+        if (entity.getContatos() != null) {
+            contatosDTO = entity.getContatos().stream()
+                    .map(this::toContatoResponseDTO)
+                    .toList();
+        }
+
         return new PessoaResponseDTO(
                 entity.getId(),
                 entity.getNome(),
                 toEnderecoDTO(entity.getEndereco()),
-                entity.getAtivo()
+                entity.getAtivo(),
+                contatosDTO
         );
     }
 
-    private Endereco toEnderecoEntity(EnderecoDTO dto) {
-        if (dto == null) {
-            return null;
-        }
+    // --- MÉTODOS AUXILIARES DE ENDEREÇO ---
 
+    private Endereco toEnderecoEntity(EnderecoDTO dto) {
+        if (dto == null) return null;
         Endereco endereco = new Endereco();
         endereco.setLogradouro(dto.logradouro());
         endereco.setNumero(dto.numero());
@@ -47,15 +82,11 @@ public class PessoaMapper {
         endereco.setCep(dto.cep());
         endereco.setCidade(dto.cidade());
         endereco.setEstado(dto.estado());
-
         return endereco;
     }
 
     private EnderecoDTO toEnderecoDTO(Endereco entity) {
-        if (entity == null) {
-            return null;
-        }
-
+        if (entity == null) return null;
         return new EnderecoDTO(
                 entity.getLogradouro(),
                 entity.getNumero(),
@@ -64,6 +95,29 @@ public class PessoaMapper {
                 entity.getCep(),
                 entity.getCidade(),
                 entity.getEstado()
+        );
+    }
+
+    // --- MÉTODOS AUXILIARES DE CONTATO ---
+
+    private Contato toContatoEntity(ContatoRequestDTO dto, Pessoa pessoa) {
+        if (dto == null) return null;
+        Contato contato = new Contato();
+        contato.setId(dto.id());
+        contato.setNome(dto.nome());
+        contato.setEmail(dto.email());
+        contato.setTelefone(dto.telefone());
+        contato.setPessoa(pessoa); // IMPORTANTE: Vincula o contato à pessoa
+        return contato;
+    }
+
+    private ContatoResponseDTO toContatoResponseDTO(Contato entity) {
+        if (entity == null) return null;
+        return new ContatoResponseDTO(
+                entity.getId(),
+                entity.getNome(),
+                entity.getEmail(),
+                entity.getTelefone()
         );
     }
 }
