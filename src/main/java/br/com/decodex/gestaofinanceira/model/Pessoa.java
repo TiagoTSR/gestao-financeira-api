@@ -1,12 +1,17 @@
 package br.com.decodex.gestaofinanceira.model;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -28,6 +33,10 @@ public class Pessoa {
     @NotNull
     @Column(nullable = false)
     private Boolean ativo;
+    
+    @Valid
+	@OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL)
+	private List<Contato> contatos;	
 
     public Long getId() {
         return id;
@@ -60,6 +69,14 @@ public class Pessoa {
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
     }
+    
+    public List<Contato> getContatos() {
+		return contatos;
+	}
+
+	public void setContatos(List<Contato> contatos) {
+		this.contatos = contatos;
+	}
 
     @Override
     public int hashCode() {

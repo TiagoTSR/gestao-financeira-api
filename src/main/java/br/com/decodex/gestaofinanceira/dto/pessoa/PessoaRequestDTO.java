@@ -1,5 +1,8 @@
 package br.com.decodex.gestaofinanceira.dto.pessoa;
 
+import java.util.List;
+
+import br.com.decodex.gestaofinanceira.dto.contato.ContatoRequestDTO;
 import br.com.decodex.gestaofinanceira.dto.endereco.EnderecoDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,6 +15,8 @@ public record PessoaRequestDTO(
         EnderecoDTO endereco,
 
         @NotNull
-        Boolean ativo
+        Boolean ativo,
+        
+        List<ContatoRequestDTO> contatos
 ) {}
 
