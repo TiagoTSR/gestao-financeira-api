@@ -10,6 +10,10 @@ public class PessoaFilter {
 
     private Boolean ativo;
     
+    private String contatoNome;
+    private String contatoEmail;
+    private String contatoTelefone;
+    
     public String getNome() {
         return nome;
     }
@@ -33,4 +37,29 @@ public class PessoaFilter {
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
     }
+
+	public String getContatoNome() {
+		return contatoNome;
+	}
+
+	public void setContatoNome(String contatoNome) {
+		this.contatoNome = contatoNome;
+	}
+
+	public String getContatoEmail() {
+		return contatoEmail;
+	}
+
+	public void setContatoEmail(String contatoEmail) {
+		this.contatoEmail = contatoEmail;
+	}
+
+	public String getContatoTelefone() {
+		return contatoTelefone;
+	}
+
+	public void setContatoTelefone(String contatoTelefone) {
+		this.contatoTelefone = contatoTelefone;
+	}
+    
 }
