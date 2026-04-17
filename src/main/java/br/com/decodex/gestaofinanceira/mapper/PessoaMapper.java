@@ -24,7 +24,6 @@ public class PessoaMapper {
         pessoa.setAtivo(dto.ativo());
         pessoa.setEndereco(toEnderecoEntity(dto.endereco()));
         
-        // Converte e vincula os contatos
         if (dto.contatos() != null) {
             List<Contato> contatos = dto.contatos().stream()
                     .map(c -> toContatoEntity(c, pessoa))
@@ -39,15 +38,30 @@ public class PessoaMapper {
         pessoa.setNome(dto.nome());
         pessoa.setAtivo(dto.ativo());
         pessoa.setEndereco(toEnderecoEntity(dto.endereco()));
-        
-        if (pessoa.getContatos() != null) {
-            pessoa.getContatos().clear();
-            if (dto.contatos() != null) {
-                pessoa.getContatos().addAll(
-                    dto.contatos().stream()
-                        .map(c -> toContatoEntity(c, pessoa))
-                        .toList()
-                );
+
+        List<Contato> atuais = pessoa.getContatos();
+        List<Contato> novos = dto.contatos().stream()
+            .map(c -> toContatoEntity(c, pessoa))
+            .toList();
+
+        atuais.removeIf(contatoAtual ->
+            novos.stream().noneMatch(n -> n.getId() != null && n.getId().equals(contatoAtual.getId()))
+        );
+
+        for (Contato novo : novos) {
+            if (novo.getId() == null) {
+                atuais.add(novo);
+            } else {
+                Contato existente = atuais.stream()
+                    .filter(c -> c.getId().equals(novo.getId()))
+                    .findFirst()
+                    .orElse(null);
+
+                if (existente != null) {
+                    existente.setNome(novo.getNome());
+                    existente.setEmail(novo.getEmail());
+                    existente.setTelefone(novo.getTelefone());
+                }
             }
         }
     }
