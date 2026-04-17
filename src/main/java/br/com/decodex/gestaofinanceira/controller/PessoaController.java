@@ -42,7 +42,7 @@ public class PessoaController {
             Pageable pageable,
             HttpServletRequest request) {
 
-    	QueryParamValidator.validate(request, Set.of("nome", "cidade", "ativo"));
+    	QueryParamValidator.validate(request, Set.of("nome", "cidade", "ativo","contatos"));
 
         Page<PessoaResponseDTO> page = pessoaService.findAll(pessoaFilter, pageable);
         return ResponseEntity.ok(page);
