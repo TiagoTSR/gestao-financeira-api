@@ -1,5 +1,6 @@
 package br.com.decodex.gestaofinanceira.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -36,7 +37,7 @@ public class Pessoa {
     
     @Valid
 	@OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL)
-	private List<Contato> contatos;	
+    private List<Contato> contatos = new ArrayList<>();	
 
     public Long getId() {
         return id;
