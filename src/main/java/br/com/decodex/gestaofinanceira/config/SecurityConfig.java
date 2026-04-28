@@ -38,9 +38,10 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                		.requestMatchers("/api/login", "/api/register", "/api/refresh-token", "/api/logout").permitAll()
-                        .anyRequest().authenticated()
-                )
+                	    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                	    .requestMatchers("/api/login", "/api/register", "/api/refresh-token", "/api/logout").permitAll()
+                	    .anyRequest().authenticated()
+                	)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -49,7 +50,11 @@ public class SecurityConfig {
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOriginPatterns(List.of("http://localhost:4200"));
+        config.setAllowedOriginPatterns(List.of(
+        	    "http://localhost:4200",
+        	    "https://*.pinggy-free.link",// temporário - remover em produção
+        	    "https://*.a.pinggy.link"// temporário - remover em produção
+        	));
         config.setExposedHeaders(List.of("Set-Cookie"));
         config.setAllowedHeaders(List.of(
                 HttpHeaders.AUTHORIZATION,
